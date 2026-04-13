@@ -14,7 +14,7 @@
         
         /* --- CSS KHAS UNTUK CETAKAN (PRINT) --- */
         @media print {
-            @page { size: A4 portrait; margin: 15mm; }
+            @page { size: A4 portrait; margin: 10mm; } /* Margin dikurangkan supaya muat 1 page */
             body { background-color: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #app-container { display: none !important; } /* Sembunyikan UI Web */
             #printSection { display: block !important; width: 100%; } /* Paparkan Borang Sahaja */
@@ -183,109 +183,107 @@
          LAYOUT CETAKAN PDF (Hanya Muncul Semasa Print) 
          Mengikut Format Gambar Yang Dimuat Naik
          ========================================== -->
-    <div id="printSection" class="hidden bg-white text-black max-w-[210mm] mx-auto font-sans leading-relaxed">
+    <div id="printSection" class="hidden bg-white text-black max-w-[210mm] mx-auto font-sans leading-snug">
         
         <!-- Header Print Logo JTM -->
-        <div class="flex items-center justify-between pb-4 mb-4">
-            <img src="https://wyu-dev.github.io/logo/jabatan-tenaga-manusia-seeklogo.png" alt="Logo JTM" class="w-32 h-auto">
-            <div class="text-right">
-                <h2 class="text-lg font-bold">JABATAN TENAGA MANUSIA</h2>
-            </div>
+        <div class="flex flex-col items-center justify-center pb-2 mb-3">
+            <img src="https://wyu-dev.github.io/logo/jabatan-tenaga-manusia-seeklogo.png" alt="Logo JTM" class="w-24 h-auto mb-1">
+            <h2 class="text-sm font-bold uppercase tracking-wide">Jabatan Tenaga Manusia</h2>
         </div>
 
-        <div class="text-center font-bold mb-8">
-            <h1 class="text-[17px] uppercase underline tracking-wide">BORANG PENGESAHAN LAPOR DIRI (LATIHAN INDUSTRI)</h1>
+        <div class="text-center font-bold mb-5">
+            <h1 class="text-[15px] uppercase underline tracking-wide">BORANG PENGESAHAN LAPOR DIRI (LATIHAN INDUSTRI)</h1>
         </div>
 
         <!-- Susun Atur Form 1 hingga 10 -->
-        <div class="text-[14px] space-y-4 px-2">
+        <div class="text-[13px] space-y-2.5 px-2">
             <!-- 1. Nama -->
             <div class="flex">
-                <div class="w-8">1.</div><div class="w-48">Nama</div><div class="w-4">:</div>
+                <div class="w-6">1.</div><div class="w-40">Nama</div><div class="w-3">:</div>
                 <div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2" id="pNama"></div>
             </div>
             
             <!-- 2. NDP & 3. No KP -->
             <div class="flex">
-                <div class="w-8">2.</div><div class="w-48">NDP</div><div class="w-4">:</div>
-                <div class="w-48 font-bold border-b border-dotted border-black px-2" id="pNdp"></div>
+                <div class="w-6">2.</div><div class="w-40">NDP</div><div class="w-3">:</div>
+                <div class="w-40 font-bold border-b border-dotted border-black px-2" id="pNdp"></div>
                 
-                <div class="w-8 ml-6">3.</div><div class="w-24">No. KP</div><div class="w-4">:</div>
+                <div class="w-6 ml-4">3.</div><div class="w-20">No. KP</div><div class="w-3">:</div>
                 <div class="flex-1 font-bold border-b border-dotted border-black px-2" id="pIc"></div>
             </div>
 
             <!-- 4. Kod Kursus & 5. Sesi -->
             <div class="flex">
-                <div class="w-8">4.</div><div class="w-48">Kod Kursus</div><div class="w-4">:</div>
-                <div class="w-48 font-bold uppercase border-b border-dotted border-black px-2" id="pKursus"></div>
+                <div class="w-6">4.</div><div class="w-40">Kod Kursus</div><div class="w-3">:</div>
+                <div class="w-40 font-bold uppercase border-b border-dotted border-black px-2" id="pKursus"></div>
 
-                <div class="w-8 ml-6">5.</div><div class="w-36">Sesi Pengambilan</div><div class="w-4">:</div>
+                <div class="w-6 ml-4">5.</div><div class="w-32">Sesi Pengambilan</div><div class="w-3">:</div>
                 <div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2" id="pSesi"></div>
             </div>
 
             <!-- 6. Alamat Syarikat -->
             <div class="flex items-end">
-                <div class="w-8">6.</div><div class="w-48">Alamat Majikan/Syarikat</div><div class="w-4 pb-1">:</div>
-                <div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2 min-h-[1.5rem]" id="pSyarikatAlamat"></div>
+                <div class="w-6">6.</div><div class="w-40">Alamat Majikan/Syarikat</div><div class="w-3 pb-0.5">:</div>
+                <div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2 min-h-[1.2rem]" id="pSyarikatAlamat"></div>
             </div>
 
             <!-- 7. Alamat Tempat Tinggal -->
             <div class="flex items-end">
-                <div class="w-8">7.</div><div class="w-48">Alamat Tempat Tinggal</div><div class="w-4 pb-1">:</div>
-                <div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2 min-h-[1.5rem]" id="pAlamat"></div>
+                <div class="w-6">7.</div><div class="w-40">Alamat Tempat Tinggal</div><div class="w-3 pb-0.5">:</div>
+                <div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2 min-h-[1.2rem]" id="pAlamat"></div>
             </div>
 
             <!-- 8. No Telefon -->
             <div class="flex">
-                <div class="w-8">8.</div><div class="w-48">No. Telefon</div><div class="w-4">:</div>
+                <div class="w-6">8.</div><div class="w-40">No. Telefon</div><div class="w-3">:</div>
                 <div class="flex-1 font-bold border-b border-dotted border-black px-2" id="pTel"></div>
             </div>
 
             <!-- 9. Tarikh Lapor Diri -->
             <div class="flex">
-                <div class="w-8">9.</div><div class="w-48">Tarikh Lapor Diri</div><div class="w-4">:</div>
+                <div class="w-6">9.</div><div class="w-40">Tarikh Lapor Diri</div><div class="w-3">:</div>
                 <div class="flex-1 font-bold border-b border-dotted border-black px-2" id="pLaporDiri"></div>
             </div>
 
             <!-- 10. Elaun -->
-            <div class="flex items-center pt-2">
-                <div class="w-8 align-top">10.</div>
-                <div class="w-48 leading-tight">Elaun diterima <br><span class="text-xs italic">(sebulan)</span></div>
-                <div class="w-10">: RM</div>
-                <div class="w-48 font-bold border-b border-dotted border-black px-2" id="pElaun"></div>
+            <div class="flex items-center pt-1">
+                <div class="w-6 align-top">10.</div>
+                <div class="w-40 leading-tight">Elaun diterima <br><span class="text-[11px] italic">(sebulan)</span></div>
+                <div class="w-8">: RM</div>
+                <div class="w-40 font-bold border-b border-dotted border-black px-2" id="pElaun"></div>
             </div>
         </div>
 
         <!-- T/Tangan Pelajar -->
-        <div class="mt-14 flex justify-end px-2">
-            <div class="text-center w-64">
-                <div class="border-b border-black mb-2"></div>
-                <div class="text-sm">(Tandatangan Pelajar)</div>
+        <div class="mt-8 flex justify-end px-2">
+            <div class="text-center w-56">
+                <div class="border-b border-black mb-1"></div>
+                <div class="text-[12px]">(Tandatangan Pelajar)</div>
             </div>
         </div>
 
         <!-- Bahagian Pengesahan Majikan -->
-        <div class="mt-12 mb-4 text-center font-bold underline text-[15px]">PENGESAHAN MAJIKAN</div>
-        <p class="mb-14 text-justify leading-relaxed text-[14px] px-2">
+        <div class="mt-6 mb-2 text-center font-bold underline text-[14px]">PENGESAHAN MAJIKAN</div>
+        <p class="mb-8 text-justify leading-snug text-[13px] px-2">
             Dengan ini saya mengesahkan perkara di atas adalah benar dan pelajar tersebut telah memulakan Latihan Industri di tempat kami.
         </p>
 
         <!-- Signature Block Bawah -->
-        <div class="flex justify-between items-end mt-16 px-2">
-            <div class="w-1/2 space-y-5 text-[14px]">
-                <div class="flex"><div class="w-32">Nama Pegawai</div><div>: ...................................................................</div></div>
-                <div class="flex"><div class="w-32">Jawatan</div><div>: ...................................................................</div></div>
-                <div class="flex"><div class="w-32">No. Telefon</div><div>: ...................................................................</div></div>
-                <div class="flex"><div class="w-32">No. Faks</div><div>: ...................................................................</div></div>
+        <div class="flex justify-between items-end mt-8 px-2">
+            <div class="w-1/2 space-y-3 text-[13px]">
+                <div class="flex"><div class="w-28">Nama Pegawai</div><div>: ...........................................................</div></div>
+                <div class="flex"><div class="w-28">Jawatan</div><div>: ...........................................................</div></div>
+                <div class="flex"><div class="w-28">No. Telefon</div><div>: ...........................................................</div></div>
+                <div class="flex"><div class="w-28">No. Faks</div><div>: ...........................................................</div></div>
             </div>
-            <div class="text-center w-72">
-                <div class="border-b border-black mb-2"></div>
-                <div class="text-[13px]">(Tandatangan Pegawai Penyelia/Majikan dan Cop Rasmi)</div>
+            <div class="text-center w-64">
+                <div class="border-b border-black mb-1"></div>
+                <div class="text-[12px]">(Tandatangan Pegawai Penyelia/Majikan dan Cop Rasmi)</div>
             </div>
         </div>
 
         <!-- Footer / Nota Bawah -->
-        <div class="mt-16 pt-4 border-t border-black text-center text-[12px] font-bold px-2">
+        <div class="mt-8 pt-3 border-t border-black text-center text-[11px] font-bold px-2">
             Borang ini hendaklah dipos / difakskan kepada : Unit Perhubungan & Latihan Industri (UPLI) ADTEC Kuantan sebaik sahaja pelajar melaporkan diri di premis majikan/syarikat dalam tempoh 7 HARI.
         </div>
     </div>
