@@ -187,12 +187,20 @@
             </div>
 
             <div class="glass p-6 rounded-2xl">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                     <h3 class="text-lg font-bold">Senarai Pelajar</h3>
-                    <div class="flex items-center gap-2 bg-slate-800 p-1 rounded-lg">
-                        <button onclick="filterAdminTable('all')" id="fltAll" class="px-4 py-1.5 rounded-md text-sm font-medium bg-slate-600 text-white">Semua</button>
-                        <button onclick="filterAdminTable('incomplete')" id="fltInc" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition">Tidak Lengkap</button>
-                        <button onclick="filterAdminTable('complete')" id="fltCom" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition">Lengkap</button>
+                    
+                    <!-- Filters: Kursus & Status -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                        <select id="courseFilter" onchange="applyAdminFilters()" class="bg-slate-800 text-slate-200 text-sm rounded-lg p-2 border border-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-full sm:max-w-[200px] truncate">
+                            <option value="all">Semua Kursus</option>
+                        </select>
+                        
+                        <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-lg">
+                            <button onclick="setStatusFilter('all')" id="fltAll" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium bg-slate-600 text-white">Semua</button>
+                            <button onclick="setStatusFilter('incomplete')" id="fltInc" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition">Tak Lengkap</button>
+                            <button onclick="setStatusFilter('complete')" id="fltCom" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition">Lengkap</button>
+                        </div>
                     </div>
                 </div>
 
@@ -357,7 +365,7 @@
             <div class="text-center w-64"><div class="border-b border-black mb-1"></div><div class="text-[12px]">(Tandatangan Pegawai Penyelia/Majikan dan Cop Rasmi)</div></div>
         </div>
         <div class="mt-8 pt-3 border-t border-black text-center text-[11px] font-bold px-2">
-            Borang ini hendaklah dipos / difakskan kepada : Unit Perhubungan & Latihan Industri (UPLI) ADTEC Kuantan sebaik sahaja pelajar melaporkan diri di premis majikan/syarikat dalam tempoh 7 HARI.
+            Borang ini hendaklah dipos / difakskan kepada : Unit Khidmat Sokongan Komuniti dan Pekerjaan (CESS) ADTEC Kuantan sebaik sahaja pelajar melaporkan diri di premis majikan/syarikat dalam tempoh 7 HARI.
         </div>
     </div>
 
@@ -370,7 +378,7 @@
     <script>
         let currentUser = null;
         let globalAdminData = [];
-        let currentFilter = 'all';
+        let currentStatusFilter = 'all';
 
         // --- SISTEM TOAST (NOTIFIKASI) ---
         function showToast(msg, type = 'success') {
@@ -508,24 +516,33 @@
         function renderAdminDashboard() {
             let total = globalAdminData.length;
             let completeCount = 0;
+            let uniqueCourses = new Set(); // Kumpul kursus unik
 
             // Masukkan status kelengkapan ke dalam setiap data
             globalAdminData.forEach(p => {
                 p.isComplete = isDataComplete(p);
                 if(p.isComplete) completeCount++;
+                if(p.kursus && p.kursus.trim() !== '') uniqueCourses.add(p.kursus.trim());
             });
 
             document.getElementById('statTotal').innerText = total;
             document.getElementById('statComplete').innerText = completeCount;
             document.getElementById('statIncomplete').innerText = total - completeCount;
 
-            renderAdminTable();
+            // Populate Filter Kursus
+            const courseSelect = document.getElementById('courseFilter');
+            courseSelect.innerHTML = '<option value="all">Semua Kursus</option>';
+            Array.from(uniqueCourses).sort().forEach(c => {
+                courseSelect.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+
+            applyAdminFilters();
         }
 
-        function filterAdminTable(status) {
-            currentFilter = status;
+        function setStatusFilter(status) {
+            currentStatusFilter = status;
             
-            // Ubah style butang filter
+            // Ubah style butang filter status
             ['fltAll', 'fltInc', 'fltCom'].forEach(id => {
                 document.getElementById(id).classList.remove('bg-slate-600', 'text-white');
                 document.getElementById(id).classList.add('text-slate-400');
@@ -535,15 +552,23 @@
             if(status === 'incomplete') { document.getElementById('fltInc').classList.add('bg-slate-600', 'text-white'); document.getElementById('fltInc').classList.remove('text-slate-400'); }
             if(status === 'complete') { document.getElementById('fltCom').classList.add('bg-slate-600', 'text-white'); document.getElementById('fltCom').classList.remove('text-slate-400'); }
 
-            renderAdminTable();
+            applyAdminFilters();
         }
 
-        function renderAdminTable() {
+        function applyAdminFilters() {
+            const courseValue = document.getElementById('courseFilter').value;
             const tbody = document.getElementById('adminTableBody');
             
             let filteredData = globalAdminData;
-            if(currentFilter === 'complete') filteredData = globalAdminData.filter(p => p.isComplete);
-            if(currentFilter === 'incomplete') filteredData = globalAdminData.filter(p => !p.isComplete);
+
+            // 1. Tapis ikut status
+            if(currentStatusFilter === 'complete') filteredData = filteredData.filter(p => p.isComplete);
+            if(currentStatusFilter === 'incomplete') filteredData = filteredData.filter(p => !p.isComplete);
+
+            // 2. Tapis ikut kursus
+            if(courseValue !== 'all') {
+                filteredData = filteredData.filter(p => p.kursus && p.kursus.trim() === courseValue);
+            }
 
             if (filteredData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-slate-400">Tiada rekod ditemui.</td></tr>`;
@@ -552,15 +577,18 @@
 
             tbody.innerHTML = filteredData.map((p, i) => `
                 <tr class="border-b border-slate-700 hover:bg-slate-800/30 transition">
-                    <td class="p-3">${i + 1}</td>
-                    <td class="p-3 font-medium text-slate-200 uppercase truncate max-w-[200px]" title="${p.nama}">${p.nama}</td>
-                    <td class="p-3 text-slate-400">${p.ndp}</td>
-                    <td class="p-3">
+                    <td class="p-3 align-top pt-4">${i + 1}</td>
+                    <td class="p-3 font-medium text-slate-200 uppercase" title="${p.nama}">
+                        <div class="truncate max-w-[250px]">${p.nama}</div>
+                        <div class="text-[10px] text-slate-400 font-normal mt-0.5 truncate max-w-[250px]">${p.kursus}</div>
+                    </td>
+                    <td class="p-3 text-slate-400 align-top pt-4">${p.ndp}</td>
+                    <td class="p-3 align-top pt-4">
                         ${p.isComplete 
                             ? '<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold">LENGKAP</span>' 
-                            : '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-bold">TIDAK LENGKAP</span>'}
+                            : '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-bold">TAK LENGKAP</span>'}
                     </td>
-                    <td class="p-3 text-center">
+                    <td class="p-3 text-center align-top pt-4">
                         <button onclick="openAdminEdit(${globalAdminData.indexOf(p)})" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-semibold shadow transition">EDIT</button>
                     </td>
                 </tr>
