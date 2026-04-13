@@ -65,6 +65,7 @@
         <div id="studentDashboard" class="hidden space-y-6">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
                 <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <!-- Butang Cetak: Secara lalai disembunyikan -->
                     <button id="btnPrint" onclick="window.print()" class="hidden w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition shadow-lg border border-indigo-400/50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
@@ -82,8 +83,9 @@
                 </div>
 
                 <!-- Sub Menu / Tabs -->
-                <div class="flex space-x-6 border-b border-slate-700 mb-6">
+                <div class="flex space-x-6 border-b border-slate-700 mb-6" id="tabContainer">
                     <button onclick="switchTab('tabPelajar')" id="btnTabPelajar" class="pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition">Maklumat Pelajar</button>
+                    <!-- Tab Syarikat: Secara lalai disembunyikan -->
                     <button onclick="switchTab('tabSyarikat')" id="btnTabSyarikat" class="hidden pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition">Maklumat Syarikat (LI)</button>
                 </div>
 
@@ -99,7 +101,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="md:col-span-2">
                                 <label class="block text-sm uppercase text-blue-400 font-bold mb-2">Pilih Status Selepas Pengajian</label>
-                                <select id="fStatus" onchange="toggleStudentViews()" class="w-full p-3 rounded-lg bg-slate-800 border-2 border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold text-white">
+                                <select id="fStatus" onchange="handleStatusChange()" class="w-full p-3 rounded-lg bg-slate-800 border-2 border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold text-white">
                                     <option value="">-- Sila Pilih Status Anda --</option>
                                     <option value="Latihan Industri">Latihan Industri</option>
                                     <option value="Sambung Belajar">Sambung Belajar</option>
@@ -438,7 +440,7 @@
         }
 
         /* --- FUNGSI DINAMIK PELAJAR (STATUS) --- */
-        function toggleStudentViews() {
+        function handleStatusChange() {
             const status = document.getElementById('fStatus').value;
             const tabSyarikatBtn = document.getElementById('btnTabSyarikat');
             const btnPrint = document.getElementById('btnPrint');
@@ -447,17 +449,20 @@
             const secKerja = document.getElementById('secKerja');
 
             if (status === 'Latihan Industri') {
+                // Tunjuk butang cetak & tab syarikat
                 tabSyarikatBtn.classList.remove('hidden');
                 btnPrint.classList.remove('hidden');
                 secBelajar.classList.add('hidden');
                 secKerja.classList.add('hidden');
             } else if (status === 'Sambung Belajar') {
+                // Sembunyi tab syarikat, tunjuk borang belajar
                 tabSyarikatBtn.classList.add('hidden');
                 btnPrint.classList.add('hidden');
                 secBelajar.classList.remove('hidden');
                 secKerja.classList.add('hidden');
-                switchTab('tabPelajar'); // Force view ke tab pelajar
+                switchTab('tabPelajar'); // Paksa pandangan ke tab pelajar jika di tab syarikat
             } else if (status === 'Dapat Tawaran Kerja') {
+                // Sembunyi tab syarikat, tunjuk borang kerja
                 tabSyarikatBtn.classList.add('hidden');
                 btnPrint.classList.add('hidden');
                 secBelajar.classList.add('hidden');
@@ -471,6 +476,38 @@
                 switchTab('tabPelajar');
             }
         }
+
+        /* --- FUNGSI TUKAR TAB PELAJAR --- */
+        function switchTab(tabId) {
+            const tP = document.getElementById('tabPelajar');
+            const tS = document.getElementById('tabSyarikat');
+            const bP = document.getElementById('btnTabPelajar');
+            const bS = document.getElementById('btnTabSyarikat');
+            
+            // Kita guna pendekatan "menggantikan class" berbanding menindih class
+            if (tabId === 'tabPelajar') {
+                tP.classList.remove('hidden');
+                tS.classList.add('hidden');
+                
+                // Aktifkan butang Pelajar
+                bP.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
+                // Jika butang Syarikat tak hidden, jadikan ia kelabu biasa
+                if(!bS.classList.contains('hidden')){
+                   bS.className = 'pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition';
+                }
+            } else {
+                tS.classList.remove('hidden');
+                tP.classList.add('hidden');
+                
+                // Aktifkan butang Syarikat
+                if(!bS.classList.contains('hidden')){
+                    bS.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
+                }
+                // Jadikan butang Pelajar kelabu
+                bP.className = 'pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition';
+            }
+        }
+
 
         /* --- LOGIK PENGESAHAN LENGKAP / TAK LENGKAP --- */
         function isDataComplete(p) {
@@ -525,7 +562,7 @@
             document.getElementById('fAlamatKerja').value = currentUser.alamatKerja || '';
             document.getElementById('fGajiKerja').value = currentUser.gajiKerja || '';
 
-            toggleStudentViews();
+            handleStatusChange();
             populatePrintData();
             switchTab('tabPelajar');
         }
@@ -763,21 +800,7 @@
         }
 
 
-        // --- FUNGSI UTILITI ---
-        function switchTab(tabId) {
-            const tP = document.getElementById('tabPelajar'), tS = document.getElementById('tabSyarikat');
-            const bP = document.getElementById('btnTabPelajar'), bS = document.getElementById('btnTabSyarikat');
-            if (tabId === 'tabPelajar') {
-                tP.classList.remove('hidden'); tS.classList.add('hidden');
-                bP.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
-                bS.className = 'pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition';
-            } else {
-                tS.classList.remove('hidden'); tP.classList.add('hidden');
-                bS.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
-                bP.className = 'pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition';
-            }
-        }
-
+        // --- FUNGSI UTILITI DATA ---
         function formatDateForInput(dateString) {
             if (!dateString) return '';
             try { const d = new Date(dateString); if (isNaN(d.getTime())) return ''; d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().split('T')[0]; } catch(e) { return ''; }
@@ -804,7 +827,7 @@
 
         function logout() { currentUser = null; globalAdminData = []; location.reload(); }
 
-        /* --- FUNGSI KEYPAD (Kekal Sama) --- */
+        /* --- FUNGSI KEYPAD ADMIN --- */
         let currentPin = '';
         function openKeypad() { currentPin = ''; updatePinDots(); document.getElementById('pinErrorText').innerText = ''; const modal = document.getElementById('keypadModal'); modal.classList.remove('hidden'); setTimeout(() => modal.firstElementChild.classList.remove('scale-95'), 10); }
         function closeKeypad() { const modal = document.getElementById('keypadModal'); modal.firstElementChild.classList.add('scale-95'); setTimeout(() => modal.classList.add('hidden'), 300); }
