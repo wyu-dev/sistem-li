@@ -56,30 +56,82 @@
             <div class="glass p-6 rounded-2xl">
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h2 id="studentName" class="text-2xl font-bold">NAMA PELAJAR</h2>
+                        <h2 id="studentName" class="text-2xl font-bold uppercase">NAMA PELAJAR</h2>
                         <p id="studentCourse" class="text-blue-400 font-medium"></p>
                     </div>
-                    <button onclick="logout()" class="text-sm bg-red-500/20 text-red-400 px-3 py-1 rounded-lg hover:bg-red-500/30">Keluar</button>
+                    <button onclick="logout()" class="text-sm bg-red-500/20 text-red-400 px-3 py-1 rounded-lg hover:bg-red-500/30 transition">Keluar</button>
                 </div>
 
-                <form id="updateForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs uppercase text-slate-400 mb-1">Alamat Kediaman Semasa</label>
-                        <textarea id="fAlamat" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea>
+                <!-- Sub Menu / Tabs -->
+                <div class="flex space-x-6 border-b border-slate-700 mb-6">
+                    <button onclick="switchTab('tabPelajar')" id="btnTabPelajar" class="pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition">Maklumat Pelajar</button>
+                    <button onclick="switchTab('tabSyarikat')" id="btnTabSyarikat" class="pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition">Maklumat Syarikat</button>
+                </div>
+
+                <form id="updateForm">
+                    <!-- TAB 1: MAKLUMAT PELAJAR -->
+                    <div id="tabPelajar" class="space-y-6 animate-fade-in">
+                        <!-- Paparan Maklumat Asas (Read-Only) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+                            <div><span class="block text-xs text-slate-400 mb-1">NO. KAD PENGENALAN</span><p id="dispIc" class="font-medium text-slate-200"></p></div>
+                            <div><span class="block text-xs text-slate-400 mb-1">NO. NDP</span><p id="dispNdp" class="font-medium text-slate-200"></p></div>
+                            <div class="md:col-span-2"><span class="block text-xs text-slate-400 mb-1">SESI KEMASUKAN</span><p id="dispSesi" class="font-medium text-slate-200"></p></div>
+                        </div>
+
+                        <!-- Ruangan Input Pelajar -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tempat Tinggal Semasa</label>
+                                <textarea id="fAlamat" rows="3" placeholder="Sila lengkapkan alamat..." class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs uppercase text-slate-400 mb-1">No. Telefon Pelajar</label>
+                                <input type="text" id="fTel" placeholder="Contoh: 012-3456789" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs uppercase text-slate-400 mb-1">No. Telefon Pelajar</label>
-                        <input type="text" id="fTel" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700">
+
+                    <!-- TAB 2: MAKLUMAT SYARIKAT -->
+                    <div id="tabSyarikat" class="hidden space-y-6 animate-fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Alamat Syarikat LI</label>
+                                <textarea id="fSyarikat" rows="3" placeholder="Alamat penuh syarikat latihan industri..." class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Nama Penyelia (PIC)</label>
+                                <input type="text" id="fPenyelia" placeholder="Nama pegawai yang memantau..." class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-slate-400 mb-1">No. Telefon Syarikat / Penyelia</label>
+                                <input type="text" id="fTelSyarikat" placeholder="Contoh: 03-12345678" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Elaun Diterima (RM)</label>
+                                <input type="number" id="fElaun" placeholder="Contoh: 500" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Lapor Diri LI</label>
+                                <input type="date" id="fLaporDiri" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div class="hidden md:block"></div> <!-- Spacer -->
+                            <div>
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Mula LI</label>
+                                <input type="date" id="fMulaLI" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Tamat LI</label>
+                                <input type="date" id="fTamatLI" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs uppercase text-slate-400 mb-1">Nama Penyelia / PIC Syarikat</label>
-                        <input type="text" id="fPenyelia" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700">
+
+                    <!-- Butang Simpan -->
+                    <div class="pt-6 mt-6 border-t border-slate-700">
+                        <button type="button" onclick="handleUpdate()" id="btnUpdate" class="w-full bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg font-bold transition flex items-center justify-center gap-2">
+                            KEMASKINI MAKLUMAT
+                        </button>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs uppercase text-slate-400 mb-1">Alamat Syarikat LI</label>
-                        <textarea id="fSyarikat" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea>
-                    </div>
-                    <button type="button" onclick="handleUpdate()" id="btnUpdate" class="md:col-span-2 bg-green-600 hover:bg-green-500 py-3 rounded-lg font-bold">KEMASKINI MAKLUMAT</button>
                 </form>
             </div>
         </div>
@@ -164,16 +216,67 @@
             }
         }
 
+        // Logic Tab Navigation
+        function switchTab(tabId) {
+            const tabPelajar = document.getElementById('tabPelajar');
+            const tabSyarikat = document.getElementById('tabSyarikat');
+            const btnPelajar = document.getElementById('btnTabPelajar');
+            const btnSyarikat = document.getElementById('btnTabSyarikat');
+
+            if (tabId === 'tabPelajar') {
+                tabPelajar.classList.remove('hidden');
+                tabSyarikat.classList.add('hidden');
+                btnPelajar.classList.add('border-blue-500', 'text-blue-400');
+                btnPelajar.classList.remove('border-transparent', 'text-slate-400');
+                btnSyarikat.classList.remove('border-blue-500', 'text-blue-400');
+                btnSyarikat.classList.add('border-transparent', 'text-slate-400');
+            } else {
+                tabSyarikat.classList.remove('hidden');
+                tabPelajar.classList.add('hidden');
+                btnSyarikat.classList.add('border-blue-500', 'text-blue-400');
+                btnSyarikat.classList.remove('border-transparent', 'text-slate-400');
+                btnPelajar.classList.remove('border-blue-500', 'text-blue-400');
+                btnPelajar.classList.add('border-transparent', 'text-slate-400');
+            }
+        }
+
+        // Helper: Convert Google Sheet Date format to YYYY-MM-DD for HTML input type="date"
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            try {
+                const d = new Date(dateString);
+                if (isNaN(d.getTime())) return ''; // Return empty if invalid
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // Fix timezone shift
+                return d.toISOString().split('T')[0];
+            } catch(e) { return ''; }
+        }
+
         function renderStudentDashboard() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('studentDashboard').classList.remove('hidden');
+            
+            // Set Read-Only Data
             document.getElementById('studentName').innerText = currentUser.nama;
             document.getElementById('studentCourse').innerText = currentUser.kursus;
+            document.getElementById('dispIc').innerText = currentUser.ic;
+            document.getElementById('dispNdp').innerText = currentUser.ndp;
+            document.getElementById('dispSesi').innerText = currentUser.sesi || 'Tiada maklumat';
 
+            // Set Data Pelajar
             document.getElementById('fAlamat').value = currentUser.alamat || '';
             document.getElementById('fTel').value = currentUser.telefon || '';
-            document.getElementById('fPenyelia').value = currentUser.penyelia || '';
+            
+            // Set Data Syarikat
             document.getElementById('fSyarikat').value = currentUser.alamatSyarikat || '';
+            document.getElementById('fPenyelia').value = currentUser.penyelia || '';
+            document.getElementById('fTelSyarikat').value = currentUser.telefonSyarikat || '';
+            document.getElementById('fElaun').value = currentUser.elaun || '';
+            document.getElementById('fLaporDiri').value = formatDateForInput(currentUser.laporDiri);
+            document.getElementById('fMulaLI').value = formatDateForInput(currentUser.mulaLI);
+            document.getElementById('fTamatLI').value = formatDateForInput(currentUser.tamatLI);
+
+            // Default buka tab pelajar
+            switchTab('tabPelajar');
         }
 
         async function handleUpdate() {
@@ -188,7 +291,11 @@
                 telefon: document.getElementById('fTel').value,
                 penyelia: document.getElementById('fPenyelia').value,
                 alamatSyarikat: document.getElementById('fSyarikat').value,
-                // Tambah field lain jika perlu
+                telefonSyarikat: document.getElementById('fTelSyarikat').value,
+                mulaLI: document.getElementById('fMulaLI').value,
+                tamatLI: document.getElementById('fTamatLI').value,
+                laporDiri: document.getElementById('fLaporDiri').value,
+                elaun: document.getElementById('fElaun').value
             });
 
             try {
