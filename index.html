@@ -7,514 +7,606 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body{font-family:'DM Sans',sans-serif;background-color:#0f172a;color:white}
-        .glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1)}
-        .glass-dark{background:rgba(0,0,0,0.4);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,0.05)}
-        .loading-spinner{border:3px solid rgba(255,255,255,.3);border-radius:50%;border-top:3px solid #fff;width:24px;height:24px;animation:spin 1s linear infinite}
-        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        @media print{
-            @page{size:A4 portrait;margin:10mm}
-            body{background-color:white!important;color:black!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-            #app-container{display:none!important}
-            #printSection{display:block!important;width:100%}
-        }
+        body { font-family: 'DM Sans', sans-serif; background-color: #0f172a; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-dark { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .loading-spinner { border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top: 3px solid #fff; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen">
-<script>
-const CONFIG={
-    GAS_URL:"https://script.google.com/macros/s/AKfycbyAJxveRNu0bSTFdKQkOVFWmoQMu7xxgq4r8gJEYAv7-qtWRm8jbhTiQtsOx2wFhvHNzg/exec",
-    ADMIN_PIN:"5542"
-};
-</script>
 
-<div id="app-container" class="p-4 md:p-8 max-w-5xl mx-auto">
-    <header class="text-center mb-10">
-        <img src="https://i.postimg.cc/RVvGnTkW/Logo_ADTEC_JTM_2025_small.png" alt="Logo ADTEC" class="h-20 mx-auto mb-4" onerror="this.style.display='none'">
-        <h1 class="text-3xl font-bold text-blue-400">SISTEM PENGURUSAN LI</h1>
-        <p class="text-slate-400">ADTEC JTM Kampus Kuantan</p>
-    </header>
+    <script>
+        const CONFIG = {
+            // PASTIKAN ANDA LETAK DEPLOYMENT ID / URL YANG TERBARU SELEPAS KEMASKINI CODE.GS
+            GAS_URL: "https://script.google.com/macros/s/AKfycbyTySJ66CIFW9jLuib3Lz23lfTXQe5HfXOxZXQlOo_Uh3Go4ZII3uB2-LZxFmJw-z6r5g/exec", 
+            ADMIN_PIN: "5542"
+        };
+    </script>
 
-    <!-- Login -->
-    <div id="loginScreen" class="glass p-8 rounded-2xl shadow-xl max-w-md mx-auto relative">
-        <h2 class="text-xl font-semibold mb-6 text-center">Log Masuk Pelajar</h2>
-        <div class="space-y-4">
-            <div><label class="block text-sm mb-1 text-slate-300">No. Kad Pengenalan</label><input type="text" id="inpIC" placeholder="Contoh: 051107010525" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" onkeydown="if(event.key==='Enter')handleLogin()"></div>
-            <div><label class="block text-sm mb-1 text-slate-300">No. NDP</label><input type="text" id="inpNDP" placeholder="Contoh: 07225012" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" onkeydown="if(event.key==='Enter')handleLogin()"></div>
-            <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">MASUK</button>
-            <p id="loginError" class="text-red-400 text-sm text-center hidden"></p>
+    <div id="app-container" class="p-4 md:p-8 max-w-5xl mx-auto">
+        <header class="text-center mb-10">
+            <img src="https://i.postimg.cc/RVvGnTkW/Logo_ADTEC_JTM_2025_small.png" alt="Logo ADTEC" class="h-20 mx-auto mb-4">
+            <h1 class="text-3xl font-bold text-blue-400">SISTEM PENGURUSAN LI</h1>
+            <p class="text-slate-400">ADTEC JTM Kampus Kuantan</p>
+        </header>
+
+        <!-- Login Screen -->
+        <div id="loginScreen" class="glass p-8 rounded-2xl shadow-xl max-w-md mx-auto relative">
+            <h2 class="text-xl font-semibold mb-6 text-center">Log Masuk Pelajar</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm mb-1 text-slate-300">No. Kad Pengenalan</label>
+                    <input type="text" id="inpIC" placeholder="Contoh: 051107010525" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-slate-300">No. NDP</label>
+                    <input type="text" id="inpNDP" placeholder="Contoh: 07225012" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
+                    MASUK
+                </button>
+                <p id="loginError" class="text-red-400 text-sm text-center hidden"></p>
+            </div>
+            <div class="mt-8 text-center border-t border-slate-700/50 pt-4">
+                <button onclick="openKeypad()" class="text-slate-400 text-xs tracking-widest uppercase font-bold opacity-30 hover:opacity-100 hover:text-indigo-400 transition-all duration-300">
+                    Panel Pentadbir
+                </button>
+            </div>
         </div>
-        <div class="mt-8 text-center border-t border-slate-700/50 pt-4">
-            <button onclick="openKeypad()" class="text-slate-400 text-xs tracking-widest uppercase font-bold opacity-30 hover:opacity-100 hover:text-indigo-400 transition-all duration-300">Panel Pentadbir</button>
+
+        <!-- Dashboard Pelajar -->
+        <div id="studentDashboard" class="hidden space-y-6">
+            <div class="flex justify-end items-center bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
+                <button onclick="logout()" class="text-sm bg-red-500/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 transition w-full sm:w-auto font-medium">Log Keluar</button>
+            </div>
+
+            <div class="glass p-6 rounded-2xl">
+                <div class="mb-6">
+                    <h2 id="studentName" class="text-2xl font-bold uppercase">NAMA PELAJAR</h2>
+                    <p id="studentCourse" class="text-blue-400 font-medium"></p>
+                </div>
+
+                <!-- Sub Menu / Tabs -->
+                <div class="flex space-x-6 border-b border-slate-700 mb-6">
+                    <button onclick="switchTab('tabPelajar')" id="btnTabPelajar" class="pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition">Maklumat Pelajar</button>
+                    <button onclick="switchTab('tabSyarikat')" id="btnTabSyarikat" class="hidden pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition">Maklumat Syarikat (LI)</button>
+                </div>
+
+                <form id="updateForm">
+                    <!-- TAB 1: MAKLUMAT PELAJAR -->
+                    <div id="tabPelajar" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+                            <div><span class="block text-xs text-slate-400 mb-1">NO. KAD PENGENALAN</span><p id="dispIc" class="font-medium text-slate-200"></p></div>
+                            <div><span class="block text-xs text-slate-400 mb-1">NO. NDP</span><p id="dispNdp" class="font-medium text-slate-200"></p></div>
+                            <div class="md:col-span-2"><span class="block text-xs text-slate-400 mb-1">SESI KEMASUKAN</span><p id="dispSesi" class="font-medium text-slate-200"></p></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm uppercase text-blue-400 font-bold mb-2">Pilih Status Selepas Pengajian</label>
+                                <select id="fStatus" onchange="handleStatusChange()" class="w-full p-3 rounded-lg bg-slate-800 border-2 border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold text-white">
+                                    <option value="">-- Sila Pilih Status Anda --</option>
+                                    <option value="Latihan Industri">Latihan Industri</option>
+                                    <option value="Sambung Belajar">Sambung Belajar</option>
+                                    <option value="Dapat Tawaran Kerja">Dapat Tawaran Kerja</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tempat Tinggal Semasa</label>
+                                <textarea id="fAlamat" rows="2" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:ring-1 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs uppercase text-slate-400 mb-1">No. Telefon Pelajar</label>
+                                <input type="text" id="fTel" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            
+                            <!-- SEKSYEN SAMBUNG BELAJAR -->
+                            <div id="secBelajar" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 p-4 border border-indigo-500/40 rounded-xl bg-indigo-500/5">
+                                <h3 class="md:col-span-2 text-indigo-400 font-bold uppercase text-sm mb-2">Maklumat Sambung Belajar</h3>
+                                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Institusi</label><input type="text" id="fNamaInstitusi" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Institusi</label><textarea id="fAlamatInstitusi" rows="2" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea></div>
+                                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Pendaftaran</label><input type="date" id="fTarikhDaftar" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                            </div>
+
+                            <!-- SEKSYEN TAWARAN KERJA -->
+                            <div id="secKerja" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 p-4 border border-green-500/40 rounded-xl bg-green-500/5">
+                                <h3 class="md:col-span-2 text-green-400 font-bold uppercase text-sm mb-2">Maklumat Pekerjaan</h3>
+                                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Tempat Kerja</label><input type="text" id="fNamaKerja" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tempat Kerja</label><textarea id="fAlamatKerja" rows="2" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea></div>
+                                <div><label class="block text-xs uppercase text-slate-400 mb-1">Gaji (RM)</label><input type="number" id="fGajiKerja" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                            </div>
+
+                            <!-- SEKSYEN UPLOAD BUKTI BERGAMBAR -->
+                            <div id="secBukti" class="hidden md:col-span-2 mt-2 p-5 border border-yellow-500/40 rounded-xl bg-yellow-500/5">
+                                <h3 class="text-yellow-400 font-bold uppercase text-sm mb-3">Muat Naik Bukti (Surat Tawaran / Pendaftaran)</h3>
+                                
+                                <div id="buktiSediaAdaContainer" class="mb-4 hidden">
+                                    <p class="text-xs text-slate-400 mb-1">Bukti Dimuat Naik Sebelum Ini:</p>
+                                    <a id="buktiPreviewSediaAda" href="#" target="_blank" class="inline-block bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-sm transition">Lihat Dokumen</a>
+                                </div>
+
+                                <label class="block text-xs uppercase text-slate-400 mb-1">Muat Naik Gambar Baharu (Kamera / Galeri)</label>
+                                <input type="file" id="fBukti" accept="image/*" class="w-full p-2 rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 transition cursor-pointer">
+                                <p class="text-xs text-slate-400 mt-2">Menyokong format imej. Memuat naik gambar baru akan menggantikan bukti sedia ada.</p>
+                                
+                                <div id="buktiPreviewContainer" class="mt-4 hidden">
+                                    <p class="text-xs text-slate-400 mb-1">Pratonton Imej Pilihan:</p>
+                                    <img id="buktiPreview" src="" class="max-h-48 rounded-lg border border-slate-600 object-contain shadow-lg">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: MAKLUMAT SYARIKAT (LI) -->
+                    <div id="tabSyarikat" class="hidden space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Syarikat LI</label><textarea id="fSyarikat" rows="3" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea></div>
+                            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Penyelia</label><input type="text" id="fPenyelia" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Tel Syarikat</label><input type="text" id="fTelSyarikat" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Elaun (RM)</label><input type="number" id="fElaun" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Lapor</label><input type="date" id="fLaporDiri" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Mula LI</label><input type="date" id="fMulaLI" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Tamat LI</label><input type="date" id="fTamatLI" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 mt-6 border-t border-slate-700">
+                        <button type="button" onclick="handleUpdate()" id="btnUpdate" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition flex justify-center">SIMPAN / KEMASKINI MAKLUMAT</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard Admin -->
+        <div id="adminDashboard" class="hidden space-y-6">
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <h2 class="text-2xl font-bold text-indigo-400">PAPAN PEMUKA PENTADBIR</h2>
+                </div>
+                <button onclick="logout()" class="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg">Log Keluar</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="glass p-5 rounded-xl border-l-4 border-blue-500"><p class="text-slate-400 text-sm uppercase font-bold">Jumlah Pelajar</p><h3 class="text-3xl font-bold mt-1" id="statTotal">0</h3></div>
+                <div class="glass p-5 rounded-xl border-l-4 border-green-500"><p class="text-slate-400 text-sm uppercase font-bold">Data Lengkap</p><h3 class="text-3xl font-bold mt-1 text-green-400" id="statComplete">0</h3></div>
+                <div class="glass p-5 rounded-xl border-l-4 border-red-500"><p class="text-slate-400 text-sm uppercase font-bold">Belum Lengkap</p><h3 class="text-3xl font-bold mt-1 text-red-400" id="statIncomplete">0</h3></div>
+            </div>
+
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <h3 class="text-lg font-bold">Senarai Pelajar</h3>
+                    <select id="courseFilter" onchange="applyAdminFilters()" class="bg-slate-800 text-slate-200 text-sm rounded-lg p-2 border border-slate-600">
+                        <option value="all">Semua Kursus</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead>
+                            <tr class="border-b border-slate-700 bg-slate-800/50"><th class="p-3">Bil</th><th class="p-3">Nama Pelajar</th><th class="p-3">Status</th><th class="p-3">Bukti</th><th class="p-3">Data</th><th class="p-3 text-center">Tindakan</th></tr>
+                        </thead>
+                        <tbody id="adminTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Student Dashboard -->
-    <div id="studentDashboard" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
-            <button id="btnPrint" onclick="window.print()" class="hidden w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition border border-indigo-400/50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/></svg>Cetak Lapor Diri
-            </button>
-            <button onclick="logout()" class="text-sm bg-red-500/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 transition w-full sm:w-auto font-medium">Log Keluar</button>
-        </div>
-        <div class="glass p-6 rounded-2xl">
-            <div class="mb-6">
-                <h2 id="studentName" class="text-2xl font-bold uppercase"></h2>
-                <p id="studentCourse" class="text-blue-400 font-medium"></p>
+    <!-- Modal Keypad PIN -->
+    <div id="keypadModal" class="hidden fixed inset-0 glass-dark z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 p-8 rounded-3xl shadow-2xl w-full max-w-sm">
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-slate-200">Akses Pentadbir</h3>
+                <div class="mt-4 flex justify-center gap-2 h-6" id="pinDots">
+                    <div class="w-4 h-4 rounded-full border-2 border-slate-600"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600"></div>
+                </div>
+                <p id="pinErrorText" class="text-red-400 text-xs mt-2 min-h-[1rem]"></p>
             </div>
-            <div class="flex space-x-6 border-b border-slate-700 mb-6">
-                <button onclick="switchTab('tabPelajar')" id="btnTabPelajar" class="pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition">Maklumat Pelajar</button>
-                <button onclick="switchTab('tabSyarikat')" id="btnTabSyarikat" class="hidden pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition">Maklumat Syarikat (LI)</button>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="pressPin('1')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">1</button>
+                <button onclick="pressPin('2')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">2</button>
+                <button onclick="pressPin('3')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">3</button>
+                <button onclick="pressPin('4')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">4</button>
+                <button onclick="pressPin('5')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">5</button>
+                <button onclick="pressPin('6')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">6</button>
+                <button onclick="pressPin('7')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">7</button>
+                <button onclick="pressPin('8')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">8</button>
+                <button onclick="pressPin('9')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">9</button>
+                <button onclick="clearPin()" class="bg-red-500/20 text-red-400 font-bold p-4 rounded-xl transition">C</button>
+                <button onclick="pressPin('0')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">0</button>
+                <button onclick="closeKeypad()" class="bg-slate-700/50 font-bold p-4 rounded-xl transition">X</button>
             </div>
-            <form id="updateForm">
-                <!-- Tab Pelajar -->
-                <div id="tabPelajar" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
-                        <div><span class="block text-xs text-slate-400 mb-1">NO. KAD PENGENALAN</span><p id="dispIc" class="font-medium text-slate-200"></p></div>
-                        <div><span class="block text-xs text-slate-400 mb-1">NO. NDP</span><p id="dispNdp" class="font-medium text-slate-200"></p></div>
-                        <div class="md:col-span-2"><span class="block text-xs text-slate-400 mb-1">SESI KEMASUKAN</span><p id="dispSesi" class="font-medium text-slate-200"></p></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm uppercase text-blue-400 font-bold mb-2">Pilih Status Selepas Pengajian</label>
-                            <select id="fStatus" onchange="handleStatusChange()" class="w-full p-3 rounded-lg bg-slate-800 border-2 border-blue-500 focus:outline-none font-bold text-white">
-                                <option value="">-- Sila Pilih Status Anda --</option>
-                                <option value="Latihan Industri">Latihan Industri</option>
-                                <option value="Sambung Belajar">Sambung Belajar</option>
-                                <option value="Dapat Tawaran Kerja">Dapat Tawaran Kerja</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-2 border-t border-slate-700 mt-2 pt-4"></div>
-                        <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tempat Tinggal Semasa</label><textarea id="fAlamat" rows="2" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea></div>
-                        <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">No. Telefon Pelajar</label><input type="text" id="fTel" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        <div id="secBelajar" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 p-4 border border-indigo-500/40 rounded-xl bg-indigo-500/5">
-                            <h3 class="md:col-span-2 text-indigo-400 font-bold uppercase text-sm">Maklumat Sambung Belajar</h3>
-                            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Institusi</label><input type="text" id="fNamaInstitusi" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Institusi</label><textarea id="fAlamatInstitusi" rows="2" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea></div>
-                            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Pendaftaran</label><input type="date" id="fTarikhDaftar" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        </div>
-                        <div id="secKerja" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 p-4 border border-green-500/40 rounded-xl bg-green-500/5">
-                            <h3 class="md:col-span-2 text-green-400 font-bold uppercase text-sm">Maklumat Pekerjaan</h3>
-                            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Tempat Kerja</label><input type="text" id="fNamaKerja" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tempat Kerja</label><textarea id="fAlamatKerja" rows="2" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Gaji Ditawarkan (RM)</label><input type="number" id="fGajiKerja" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Tab Syarikat -->
-                <div id="tabSyarikat" class="hidden space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Syarikat LI</label><textarea id="fSyarikat" rows="3" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></textarea></div>
-                        <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Penyelia (PIC)</label><input type="text" id="fPenyelia" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">No. Telefon Syarikat</label><input type="text" id="fTelSyarikat" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Elaun Diterima (RM)</label><input type="number" id="fElaun" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Lapor Diri LI</label><input type="date" id="fLaporDiri" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        <div class="hidden md:block"></div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Mula LI</label><input type="date" id="fMulaLI" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Tamat LI</label><input type="date" id="fTamatLI" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700"></div>
-                    </div>
-                </div>
-                <div class="pt-6 mt-6 border-t border-slate-700">
-                    <button type="button" onclick="handleUpdate()" id="btnUpdate" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition flex justify-center items-center gap-2">SIMPAN / KEMASKINI MAKLUMAT</button>
-                </div>
-            </form>
         </div>
     </div>
 
-    <!-- Admin Dashboard -->
-    <div id="adminDashboard" class="hidden space-y-6">
-        <div class="flex justify-between items-center mb-2">
-            <div><h2 class="text-2xl font-bold text-indigo-400">PAPAN PEMUKA PENTADBIR</h2><p class="text-slate-400 text-sm">Analisis dan pengurusan data halatuju pelajar</p></div>
-            <button onclick="logout()" class="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 transition">Log Keluar</button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass p-5 rounded-xl border-l-4 border-blue-500"><p class="text-slate-400 text-sm uppercase font-bold">Jumlah Pelajar</p><h3 class="text-3xl font-bold mt-1" id="statTotal">0</h3></div>
-            <div class="glass p-5 rounded-xl border-l-4 border-green-500"><p class="text-slate-400 text-sm uppercase font-bold">Data Lengkap</p><h3 class="text-3xl font-bold mt-1 text-green-400" id="statComplete">0</h3></div>
-            <div class="glass p-5 rounded-xl border-l-4 border-red-500"><p class="text-slate-400 text-sm uppercase font-bold">Belum Lengkap</p><h3 class="text-3xl font-bold mt-1 text-red-400" id="statIncomplete">0</h3></div>
-        </div>
-        <div class="glass p-6 rounded-2xl">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <h3 class="text-lg font-bold">Senarai Pelajar</h3>
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                    <select id="courseFilter" onchange="applyAdminFilters()" class="bg-slate-800 text-slate-200 text-sm rounded-lg p-2 border border-slate-600 focus:outline-none max-w-full sm:max-w-[150px]"><option value="all">Semua Kursus</option></select>
-                    <select id="statusFilterCombo" onchange="applyAdminFilters()" class="bg-slate-800 text-slate-200 text-sm rounded-lg p-2 border border-slate-600 focus:outline-none max-w-full sm:max-w-[150px]">
-                        <option value="all">Semua Status</option>
+    <!-- Modal Edit Pentadbir (Dinamik) -->
+    <div id="adminEditModal" class="hidden fixed inset-0 glass-dark z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-2xl my-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+                <h3 class="text-lg font-bold text-blue-400">Kemaskini Rekod Pelajar</h3>
+                <button onclick="closeAdminEdit()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <div class="mb-4">
+                <p class="font-bold text-lg" id="aEditNama"></p>
+                <p class="text-sm text-slate-400" id="aEditNDP"></p>
+            </div>
+
+            <form id="adminEditForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm max-h-[60vh] overflow-y-auto pr-2">
+                <input type="hidden" id="aEditRowIdx">
+                
+                <div class="md:col-span-2">
+                    <label class="block text-xs uppercase text-slate-400 mb-1 text-blue-400 font-bold">Status Pelajar</label>
+                    <select id="aEditStatus" onchange="toggleAdminViews()" class="w-full p-2 rounded bg-slate-800 border-2 border-blue-500 font-bold text-white">
+                        <option value="">-- Belum Pilih --</option>
                         <option value="Latihan Industri">Latihan Industri</option>
                         <option value="Sambung Belajar">Sambung Belajar</option>
-                        <option value="Dapat Tawaran Kerja">Tawaran Kerja</option>
+                        <option value="Dapat Tawaran Kerja">Dapat Tawaran Kerja</option>
                     </select>
-                    <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-lg">
-                        <button onclick="setCompletionFilter('all')" id="fltAll" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium bg-slate-600 text-white">Semua</button>
-                        <button onclick="setCompletionFilter('incomplete')" id="fltInc" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition">Tak Lengkap</button>
-                        <button onclick="setCompletionFilter('complete')" id="fltCom" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition">Lengkap</button>
-                    </div>
                 </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead><tr class="border-b border-slate-700 bg-slate-800/50">
-                        <th class="p-3">Bil</th><th class="p-3">Nama Pelajar</th><th class="p-3">Status Pilihan</th><th class="p-3">Status Data</th><th class="p-3 text-center">Tindakan</th>
-                    </tr></thead>
-                    <tbody id="adminTableBody"></tbody>
-                </table>
+                
+                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tinggal</label><textarea id="aEditAlamat" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
+                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">No. Tel Pelajar</label><input type="text" id="aEditTel" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+
+                <div id="aEditSecLI" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-700 pt-3 mt-2">
+                    <h4 class="md:col-span-2 text-blue-400 font-bold">Maklumat Syarikat (LI)</h4>
+                    <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Syarikat</label><textarea id="aEditSyarikat" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
+                    <div><label class="block text-xs uppercase text-slate-400 mb-1">Penyelia</label><input type="text" id="aEditPenyelia" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                    <div><label class="block text-xs uppercase text-slate-400 mb-1">Tel Syarikat</label><input type="text" id="aEditTelSyarikat" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                    <div><label class="block text-xs uppercase text-slate-400 mb-1">Elaun (RM)</label><input type="number" id="aEditElaun" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                    <div><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Lapor</label><input type="date" id="aEditLaporDiri" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                    <div><label class="block text-xs uppercase text-slate-400 mb-1">Mula LI</label><input type="date" id="aEditMulaLI" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                    <div><label class="block text-xs uppercase text-slate-400 mb-1">Tamat LI</label><input type="date" id="aEditTamatLI" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                </div>
+
+                <div id="aEditSecBelajar" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-700 pt-3 mt-2">
+                    <h4 class="md:col-span-2 text-indigo-400 font-bold">Maklumat Sambung Belajar</h4>
+                    <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Institusi</label><input type="text" id="aEditNamaInstitusi" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                    <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Institusi</label><textarea id="aEditAlamatInstitusi" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
+                    <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Pendaftaran</label><input type="date" id="aEditTarikhDaftar" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                </div>
+
+                <div id="aEditSecKerja" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-700 pt-3 mt-2">
+                    <h4 class="md:col-span-2 text-green-400 font-bold">Maklumat Tawaran Kerja</h4>
+                    <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Tempat Kerja</label><input type="text" id="aEditNamaKerja" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                    <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tempat Kerja</label><textarea id="aEditAlamatKerja" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
+                    <div><label class="block text-xs uppercase text-slate-400 mb-1">Gaji (RM)</label><input type="number" id="aEditGajiKerja" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
+                </div>
+
+                <div class="md:col-span-2 border-t border-slate-700 pt-3 mt-2">
+                    <label class="block text-xs uppercase text-slate-400 mb-1">Bukti Bergambar (Tawaran Kerja/Belajar)</label>
+                    <a href="#" id="aEditBuktiLink" target="_blank" class="hidden text-blue-400 hover:text-blue-300 underline font-bold transition">Lihat Dokumen Muat Naik Pelajar</a>
+                    <p id="aEditTiadaBukti" class="text-slate-500 italic">Tiada dokumen dimuat naik.</p>
+                    <input type="hidden" id="aEditBuktiSediaAda">
+                </div>
+            </form>
+            <div class="flex justify-end gap-3 mt-6 border-t border-slate-700 pt-4">
+                <button onclick="closeAdminEdit()" class="px-4 py-2 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Batal</button>
+                <button onclick="saveAdminEdit()" id="btnAdminSave" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-500 font-bold">Simpan</button>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Keypad Modal -->
-<div id="keypadModal" class="hidden fixed inset-0 glass-dark z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 p-8 rounded-3xl shadow-2xl w-full max-w-sm transform scale-95 transition-transform duration-300">
-        <div class="text-center mb-6">
-            <h3 class="text-xl font-bold text-slate-200">Akses Pentadbir</h3>
-            <div class="mt-4 flex justify-center gap-2" id="pinDots">
-                <div class="w-4 h-4 rounded-full border-2 border-slate-600"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600"></div>
-            </div>
-            <p id="pinErrorText" class="text-red-400 text-xs mt-2 min-h-[1rem]"></p>
-        </div>
-        <div class="grid grid-cols-3 gap-3 mb-6">
-            <button onclick="pressPin('1')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">1</button>
-            <button onclick="pressPin('2')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">2</button>
-            <button onclick="pressPin('3')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">3</button>
-            <button onclick="pressPin('4')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">4</button>
-            <button onclick="pressPin('5')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">5</button>
-            <button onclick="pressPin('6')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">6</button>
-            <button onclick="pressPin('7')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">7</button>
-            <button onclick="pressPin('8')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">8</button>
-            <button onclick="pressPin('9')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">9</button>
-            <button onclick="clearPin()" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 font-bold p-4 rounded-xl transition">C</button>
-            <button onclick="pressPin('0')" class="bg-slate-800 hover:bg-slate-700 text-xl font-bold p-4 rounded-xl transition">0</button>
-            <button onclick="closeKeypad()" class="bg-slate-700/50 hover:bg-slate-700 text-sm font-bold p-4 rounded-xl transition">Batal</button>
-        </div>
-    </div>
-</div>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 glass p-4 rounded-xl shadow-2xl transition-transform translate-y-20 opacity-0 pointer-events-none z-50"></div>
 
-<!-- Admin Edit Modal -->
-<div id="adminEditModal" class="hidden fixed inset-0 glass-dark z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-2xl my-auto">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-            <h3 class="text-lg font-bold text-blue-400">Kemaskini Rekod Pelajar</h3>
-            <button onclick="closeAdminEdit()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
-        </div>
-        <div class="mb-4"><p class="font-bold text-lg" id="aEditNama"></p><p class="text-sm text-slate-400" id="aEditNDP"></p></div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm max-h-[60vh] overflow-y-auto pr-2">
-            <input type="hidden" id="aEditRowIdx">
-            <div class="md:col-span-2"><label class="block text-xs uppercase text-blue-400 font-bold mb-1">Status Pelajar</label><select id="aEditStatus" onchange="toggleAdminViews()" class="w-full p-2 rounded bg-slate-800 border-2 border-blue-500 font-bold text-white"><option value="">-- Belum Pilih --</option><option value="Latihan Industri">Latihan Industri</option><option value="Sambung Belajar">Sambung Belajar</option><option value="Dapat Tawaran Kerja">Dapat Tawaran Kerja</option></select></div>
-            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tinggal</label><textarea id="aEditAlamat" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
-            <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">No. Tel Pelajar</label><input type="text" id="aEditTel" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-            <div id="aEditSecLI" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-700 pt-3">
-                <h4 class="md:col-span-2 text-blue-400 font-bold">Maklumat Syarikat (LI)</h4>
-                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Syarikat</label><textarea id="aEditSyarikat" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
-                <div><label class="block text-xs uppercase text-slate-400 mb-1">Penyelia</label><input type="text" id="aEditPenyelia" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-                <div><label class="block text-xs uppercase text-slate-400 mb-1">Tel Syarikat</label><input type="text" id="aEditTelSyarikat" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-                <div><label class="block text-xs uppercase text-slate-400 mb-1">Elaun (RM)</label><input type="number" id="aEditElaun" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-                <div><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Lapor</label><input type="date" id="aEditLaporDiri" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-                <div><label class="block text-xs uppercase text-slate-400 mb-1">Mula LI</label><input type="date" id="aEditMulaLI" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-                <div><label class="block text-xs uppercase text-slate-400 mb-1">Tamat LI</label><input type="date" id="aEditTamatLI" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-            </div>
-            <div id="aEditSecBelajar" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-700 pt-3">
-                <h4 class="md:col-span-2 text-indigo-400 font-bold">Maklumat Sambung Belajar</h4>
-                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Institusi</label><input type="text" id="aEditNamaInstitusi" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Institusi</label><textarea id="aEditAlamatInstitusi" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
-                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Tarikh Pendaftaran</label><input type="date" id="aEditTarikhDaftar" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-            </div>
-            <div id="aEditSecKerja" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-700 pt-3">
-                <h4 class="md:col-span-2 text-green-400 font-bold">Maklumat Tawaran Kerja</h4>
-                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Nama Tempat Kerja</label><input type="text" id="aEditNamaKerja" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-                <div class="md:col-span-2"><label class="block text-xs uppercase text-slate-400 mb-1">Alamat Tempat Kerja</label><textarea id="aEditAlamatKerja" rows="2" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></textarea></div>
-                <div><label class="block text-xs uppercase text-slate-400 mb-1">Gaji (RM)</label><input type="number" id="aEditGajiKerja" class="w-full p-2 rounded bg-slate-800 border border-slate-700"></div>
-            </div>
-        </div>
-        <div class="flex justify-end gap-3 mt-6 border-t border-slate-700 pt-4">
-            <button onclick="closeAdminEdit()" class="px-4 py-2 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Batal</button>
-            <button onclick="saveAdminEdit()" id="btnAdminSave" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-500 font-bold flex items-center gap-2">Simpan</button>
-        </div>
-    </div>
-</div>
+    <script>
+        let currentUser = null;
+        let globalAdminData = [];
 
-<!-- Print Section -->
-<div id="printSection" class="hidden bg-white text-black max-w-[210mm] mx-auto font-sans leading-snug">
-    <div class="flex flex-col items-center justify-center pb-2 mb-3"><img src="https://wyu-dev.github.io/logo/jabatan-tenaga-manusia-seeklogo.png" alt="Logo JTM" class="w-24 h-auto mb-1"><h2 class="text-sm font-bold uppercase tracking-wide">Jabatan Tenaga Manusia</h2></div>
-    <div class="text-center font-bold mb-5"><h1 class="text-[15px] uppercase underline tracking-wide">BORANG PENGESAHAN LAPOR DIRI (LATIHAN INDUSTRI)</h1></div>
-    <div class="text-[13px] space-y-2.5 px-2">
-        <div class="flex"><div class="w-6">1.</div><div class="w-40">Nama</div><div class="w-3">:</div><div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2" id="pNama"></div></div>
-        <div class="flex"><div class="w-6">2.</div><div class="w-40">NDP</div><div class="w-3">:</div><div class="w-40 font-bold border-b border-dotted border-black px-2" id="pNdp"></div><div class="w-6 ml-4">3.</div><div class="w-20">No. KP</div><div class="w-3">:</div><div class="flex-1 font-bold border-b border-dotted border-black px-2" id="pIc"></div></div>
-        <div class="flex"><div class="w-6">4.</div><div class="w-40">Kod Kursus</div><div class="w-3">:</div><div class="w-40 font-bold uppercase border-b border-dotted border-black px-2" id="pKursus"></div><div class="w-6 ml-4">5.</div><div class="w-32">Sesi Pengambilan</div><div class="w-3">:</div><div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2" id="pSesi"></div></div>
-        <div class="flex items-end"><div class="w-6">6.</div><div class="w-40">Alamat Majikan/Syarikat</div><div class="w-3 pb-0.5">:</div><div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2 min-h-[1.2rem]" id="pSyarikatAlamat"></div></div>
-        <div class="flex items-end"><div class="w-6">7.</div><div class="w-40">Alamat Tempat Tinggal</div><div class="w-3 pb-0.5">:</div><div class="flex-1 font-bold uppercase border-b border-dotted border-black px-2 min-h-[1.2rem]" id="pAlamat"></div></div>
-        <div class="flex"><div class="w-6">8.</div><div class="w-40">No. Telefon</div><div class="w-3">:</div><div class="flex-1 font-bold border-b border-dotted border-black px-2" id="pTel"></div></div>
-        <div class="flex"><div class="w-6">9.</div><div class="w-40">Tarikh Lapor Diri</div><div class="w-3">:</div><div class="flex-1 font-bold border-b border-dotted border-black px-2" id="pLaporDiri"></div></div>
-        <div class="flex items-center pt-1"><div class="w-6">10.</div><div class="w-40 leading-tight">Elaun diterima<br><span class="text-[11px] italic">(sebulan)</span></div><div class="w-8">: RM</div><div class="w-40 font-bold border-b border-dotted border-black px-2" id="pElaun"></div></div>
-    </div>
-    <div class="mt-8 flex justify-end px-2"><div class="text-center w-56"><div class="border-b border-black mb-1"></div><div class="text-[12px]">(Tandatangan Pelajar)</div></div></div>
-    <div class="mt-6 mb-2 text-center font-bold underline text-[14px]">PENGESAHAN MAJIKAN</div>
-    <p class="mb-8 text-justify leading-snug text-[13px] px-2">Dengan ini saya mengesahkan perkara di atas adalah benar dan pelajar tersebut telah memulakan Latihan Industri di tempat kami.</p>
-    <div class="flex justify-between items-end mt-8 px-2">
-        <div class="w-1/2 space-y-3 text-[13px]">
-            <div class="flex"><div class="w-28">Nama Pegawai</div><div>: ...........................................................</div></div>
-            <div class="flex"><div class="w-28">Jawatan</div><div>: ...........................................................</div></div>
-            <div class="flex"><div class="w-28">No. Telefon</div><div>: ...........................................................</div></div>
-            <div class="flex"><div class="w-28">No. Faks</div><div>: ...........................................................</div></div>
-        </div>
-        <div class="text-center w-64"><div class="border-b border-black mb-1"></div><div class="text-[12px]">(Tandatangan Pegawai Penyelia/Majikan dan Cop Rasmi)</div></div>
-    </div>
-    <div class="mt-8 pt-3 border-t border-black text-center text-[11px] font-bold px-2">Borang ini hendaklah dipos / difakskan kepada : Unit Khidmat Sokongan Komuniti dan Pekerjaan (CESS) ADTEC Kuantan sebaik sahaja pelajar melaporkan diri di premis majikan/syarikat dalam tempoh 7 HARI.</div>
-</div>
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'text-green-400', 'text-red-400');
+            toast.classList.add(type === 'success' ? 'text-green-400' : 'text-red-400', 'opacity-100', 'translate-y-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 4000);
+        }
 
-<!-- Toast -->
-<div id="toast" class="fixed bottom-5 right-5 glass p-4 rounded-xl shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none z-50 max-w-xs"></div>
+        async function handleLogin() {
+            const ic = document.getElementById('inpIC').value;
+            const ndp = document.getElementById('inpNDP').value;
+            if (!ic || !ndp) return;
+            document.getElementById('btnLogin').innerHTML = '<div class="loading-spinner"></div>';
+            try {
+                // Untuk login, kita masih boleh guna cara biasa GET request
+                const res = await fetch(`${CONFIG.GAS_URL}?action=login&ic=${ic}&ndp=${ndp}`);
+                const result = await res.json();
+                if (result.status === 'success') {
+                    currentUser = result.data;
+                    renderStudentDashboard();
+                } else {
+                    alert(result.message);
+                }
+            } catch (e) { alert("Ralat Sambungan!"); }
+            finally { document.getElementById('btnLogin').innerText = "MASUK"; }
+        }
 
-<script>
-let currentUser=null,globalAdminData=[],currentCompletionFilter='all';
+        function handleStatusChange() {
+            const status = document.getElementById('fStatus').value;
+            const tabLI = document.getElementById('btnTabSyarikat');
+            const secBelajar = document.getElementById('secBelajar');
+            const secKerja = document.getElementById('secKerja');
+            const secBukti = document.getElementById('secBukti');
 
-function showToast(msg,type='success'){
-    const t=document.getElementById('toast');
-    t.innerText=msg;
-    t.className='fixed bottom-5 right-5 glass p-4 rounded-xl shadow-2xl transition-all duration-300 pointer-events-none z-50 max-w-xs opacity-100 translate-y-0 '+(type==='success'?'text-green-400':type==='info'?'text-blue-400':'text-red-400');
-    setTimeout(()=>{ t.className=t.className.replace('opacity-100 translate-y-0','opacity-0 translate-y-20'); },3500);
-}
+            tabLI.classList.add('hidden');
+            secBelajar.classList.add('hidden');
+            secKerja.classList.add('hidden');
+            secBukti.classList.add('hidden');
 
-async function handleLogin(){
-    const ic=document.getElementById('inpIC').value.trim();
-    const ndp=document.getElementById('inpNDP').value.trim();
-    const btn=document.getElementById('btnLogin');
-    const err=document.getElementById('loginError');
-    if(!ic||!ndp){err.innerText="Sila isi semua medan";err.classList.remove('hidden');return;}
-    btn.disabled=true;btn.innerHTML='<div class="loading-spinner mx-auto"></div>';err.classList.add('hidden');
-    try{
-        const res=await fetch(`${CONFIG.GAS_URL}?action=login&ic=${encodeURIComponent(ic)}&ndp=${encodeURIComponent(ndp)}`);
-        const result=await res.json();
-        if(result.status==='success'){currentUser=result.data;renderStudentDashboard();}
-        else{err.innerText=result.message||"Maklumat tidak sepadan.";err.classList.remove('hidden');}
-    }catch(e){err.innerText="Ralat sambungan ke pelayan.";err.classList.remove('hidden');}
-    finally{btn.disabled=false;btn.innerText="MASUK";}
-}
+            if (status === 'Latihan Industri') {
+                tabLI.classList.remove('hidden');
+            } else if (status === 'Sambung Belajar') {
+                secBelajar.classList.remove('hidden');
+                secBukti.classList.remove('hidden'); // Papar ruang muat naik
+                switchTab('tabPelajar');
+            } else if (status === 'Dapat Tawaran Kerja') {
+                secKerja.classList.remove('hidden');
+                secBukti.classList.remove('hidden'); // Papar ruang muat naik
+                switchTab('tabPelajar');
+            }
+        }
 
-function handleStatusChange(){
-    const s=document.getElementById('fStatus').value;
-    const tabSBtn=document.getElementById('btnTabSyarikat');
-    const btnPrint=document.getElementById('btnPrint');
-    tabSBtn.classList.add('hidden');btnPrint.classList.add('hidden');
-    document.getElementById('secBelajar').classList.add('hidden');
-    document.getElementById('secKerja').classList.add('hidden');
-    if(s==='Latihan Industri'){tabSBtn.classList.remove('hidden');btnPrint.classList.remove('hidden');}
-    else if(s==='Sambung Belajar'){document.getElementById('secBelajar').classList.remove('hidden');switchTab('tabPelajar');}
-    else if(s==='Dapat Tawaran Kerja'){document.getElementById('secKerja').classList.remove('hidden');switchTab('tabPelajar');}
-    else switchTab('tabPelajar');
-}
+        function switchTab(tabId) {
+            const tP = document.getElementById('tabPelajar'), tS = document.getElementById('tabSyarikat');
+            const bP = document.getElementById('btnTabPelajar'), bS = document.getElementById('btnTabSyarikat');
+            
+            if (tabId === 'tabPelajar') {
+                tP.classList.remove('hidden'); tS.classList.add('hidden');
+                bP.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
+                if(!bS.classList.contains('hidden')) bS.className = 'pb-2 border-b-2 border-transparent text-slate-400 transition';
+            } else {
+                tS.classList.remove('hidden'); tP.classList.add('hidden');
+                bS.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
+                bP.className = 'pb-2 border-b-2 border-transparent text-slate-400 transition';
+            }
+        }
 
-function switchTab(id){
-    const tP=document.getElementById('tabPelajar'),tS=document.getElementById('tabSyarikat');
-    const bP=document.getElementById('btnTabPelajar'),bS=document.getElementById('btnTabSyarikat');
-    const ac='pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
-    const ic='pb-2 border-b-2 border-transparent text-slate-400 font-medium hover:text-white transition';
-    if(id==='tabPelajar'){tP.classList.remove('hidden');tS.classList.add('hidden');bP.className=ac;if(!bS.classList.contains('hidden'))bS.className=ic;}
-    else{tS.classList.remove('hidden');tP.classList.add('hidden');bP.className=ic;if(!bS.classList.contains('hidden'))bS.className=ac;}
-}
+        // Papar Gambar Bukti Waktu Dipilih File
+        document.getElementById('fBukti').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('buktiPreview').src = e.target.result;
+                    document.getElementById('buktiPreviewContainer').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
 
-function isDataComplete(p){
-    const ne=v=>v&&v.toString().trim()!=='';
-    if(!ne(p.status)||!ne(p.alamat)||!ne(p.telefon))return false;
-    if(p.status==='Latihan Industri')return['alamatSyarikat','penyelia','telefonSyarikat','mulaLI','tamatLI','laporDiri','elaun'].every(f=>ne(p[f]));
-    if(p.status==='Sambung Belajar')return['namaInstitusi','alamatInstitusi','tarikhDaftar'].every(f=>ne(p[f]));
-    if(p.status==='Dapat Tawaran Kerja')return['namaKerja','alamatKerja','gajiKerja'].every(f=>ne(p[f]));
-    return false;
-}
+        // Convert fail jadi Base64 String
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
 
-function renderStudentDashboard(){
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('studentDashboard').classList.remove('hidden');
-    const u=currentUser;
-    document.getElementById('studentName').innerText=u.nama;
-    document.getElementById('studentCourse').innerText=u.kursus;
-    document.getElementById('dispIc').innerText=u.ic;
-    document.getElementById('dispNdp').innerText=u.ndp;
-    document.getElementById('dispSesi').innerText=u.sesi||'Tiada maklumat';
-    document.getElementById('fStatus').value=u.status||'';
-    document.getElementById('fAlamat').value=u.alamat||'';
-    document.getElementById('fTel').value=u.telefon||'';
-    document.getElementById('fSyarikat').value=u.alamatSyarikat||'';
-    document.getElementById('fPenyelia').value=u.penyelia||'';
-    document.getElementById('fTelSyarikat').value=u.telefonSyarikat||'';
-    document.getElementById('fElaun').value=u.elaun||'';
-    // FIXED: GAS return yyyy-MM-dd terus, input[type=date] terima terus tanpa convert
-    document.getElementById('fLaporDiri').value=u.laporDiri||'';
-    document.getElementById('fMulaLI').value=u.mulaLI||'';
-    document.getElementById('fTamatLI').value=u.tamatLI||'';
-    document.getElementById('fNamaInstitusi').value=u.namaInstitusi||'';
-    document.getElementById('fAlamatInstitusi').value=u.alamatInstitusi||'';
-    document.getElementById('fTarikhDaftar').value=u.tarikhDaftar||'';
-    document.getElementById('fNamaKerja').value=u.namaKerja||'';
-    document.getElementById('fAlamatKerja').value=u.alamatKerja||'';
-    document.getElementById('fGajiKerja').value=u.gajiKerja||'';
-    handleStatusChange();populatePrintData();switchTab('tabPelajar');
-}
+        function renderStudentDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.remove('hidden');
+            document.getElementById('studentName').innerText = currentUser.nama;
+            document.getElementById('studentCourse').innerText = currentUser.kursus;
+            document.getElementById('dispIc').innerText = currentUser.ic;
+            document.getElementById('dispNdp').innerText = currentUser.ndp;
+            document.getElementById('dispSesi').innerText = currentUser.sesi || '-';
+            
+            document.getElementById('fStatus').value = currentUser.status || '';
+            document.getElementById('fAlamat').value = currentUser.alamat || '';
+            document.getElementById('fTel').value = currentUser.telefon || '';
+            
+            // Set Data
+            document.getElementById('fSyarikat').value = currentUser.alamatSyarikat || '';
+            document.getElementById('fPenyelia').value = currentUser.penyelia || '';
+            document.getElementById('fTelSyarikat').value = currentUser.telefonSyarikat || '';
+            document.getElementById('fElaun').value = currentUser.elaun || '';
+            document.getElementById('fLaporDiri').value = formatDateForInput(currentUser.laporDiri);
+            document.getElementById('fMulaLI').value = formatDateForInput(currentUser.mulaLI);
+            document.getElementById('fTamatLI').value = formatDateForInput(currentUser.tamatLI);
+            document.getElementById('fNamaInstitusi').value = currentUser.namaInstitusi || '';
+            document.getElementById('fAlamatInstitusi').value = currentUser.alamatInstitusi || '';
+            document.getElementById('fTarikhDaftar').value = formatDateForInput(currentUser.tarikhDaftar);
+            document.getElementById('fNamaKerja').value = currentUser.namaKerja || '';
+            document.getElementById('fAlamatKerja').value = currentUser.alamatKerja || '';
+            document.getElementById('fGajiKerja').value = currentUser.gajiKerja || '';
 
-async function handleUpdate(){
-    const statusVal=document.getElementById('fStatus').value;
-    if(!statusVal){showToast("Sila pilih Status Pelajar!","error");return;}
-    const btn=document.getElementById('btnUpdate');
-    btn.disabled=true;btn.innerHTML='<div class="loading-spinner border-2 h-4 w-4"></div> Menyimpan...';
-    const payload={action:'updatePelajar',rowIdx:currentUser.rowIdx,status:statusVal,
-        alamat:document.getElementById('fAlamat').value,telefon:document.getElementById('fTel').value,
-        alamatSyarikat:document.getElementById('fSyarikat').value,penyelia:document.getElementById('fPenyelia').value,
-        telefonSyarikat:document.getElementById('fTelSyarikat').value,mulaLI:document.getElementById('fMulaLI').value,
-        tamatLI:document.getElementById('fTamatLI').value,laporDiri:document.getElementById('fLaporDiri').value,
-        elaun:document.getElementById('fElaun').value,namaInstitusi:document.getElementById('fNamaInstitusi').value,
-        alamatInstitusi:document.getElementById('fAlamatInstitusi').value,tarikhDaftar:document.getElementById('fTarikhDaftar').value,
-        namaKerja:document.getElementById('fNamaKerja').value,alamatKerja:document.getElementById('fAlamatKerja').value,
-        gajiKerja:document.getElementById('fGajiKerja').value};
-    try{
-        const res=await fetch(`${CONFIG.GAS_URL}?${new URLSearchParams(payload).toString()}`);
-        const result=await res.json();
-        if(result.status==='success'){
-            Object.assign(currentUser,payload); // FIXED: update currentUser lepas save
-            populatePrintData();showToast("Maklumat Berjaya Disimpan!");
-        }else showToast("Gagal: "+(result.message||'Ralat'),"error");
-    }catch(e){showToast("Ralat sambungan ke GAS","error");}
-    finally{btn.disabled=false;btn.innerText="SIMPAN / KEMASKINI MAKLUMAT";}
-}
+            // Papar bukti sedia ada (Jika Wujud)
+            if (currentUser.buktiUrl) {
+                document.getElementById('buktiPreviewSediaAda').href = currentUser.buktiUrl;
+                document.getElementById('buktiSediaAdaContainer').classList.remove('hidden');
+            } else {
+                document.getElementById('buktiSediaAdaContainer').classList.add('hidden');
+            }
 
-// FIXED: guna currentUser sahaja (bukan input field) — sentiasa segar selepas save
-function populatePrintData(){
-    if(!currentUser)return;
-    const u=currentUser;
-    document.getElementById('pNama').innerText=u.nama||'-';
-    document.getElementById('pIc').innerText=u.ic||'-';
-    document.getElementById('pNdp').innerText=u.ndp||'-';
-    document.getElementById('pKursus').innerText=u.kursus||'-';
-    document.getElementById('pSesi').innerText=u.sesi||'-';
-    document.getElementById('pTel').innerText=u.telefon||'-';
-    document.getElementById('pAlamat').innerText=u.alamat||'-';
-    document.getElementById('pSyarikatAlamat').innerText=u.alamatSyarikat||'-';
-    document.getElementById('pLaporDiri').innerText=fmtDatePrint(u.laporDiri)||'-';
-    document.getElementById('pElaun').innerText=u.elaun||'-';
-}
+            handleStatusChange();
+        }
 
-// FIXED: simple regex convert yyyy-MM-dd → dd/MM/yyyy (tiada timezone issue)
-function fmtDatePrint(s){
-    if(!s)return'';
-    const m=s.toString().trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    return m?`${m[3]}/${m[2]}/${m[1]}`:s;
-}
+        async function handleUpdate() {
+            const btn = document.getElementById('btnUpdate');
+            btn.disabled = true; btn.innerHTML = '<div class="loading-spinner border-2 h-4 w-4"></div> MENGHANTAR DATA...';
+            
+            const fileInput = document.getElementById('fBukti');
+            let fileBase64 = null;
+            let fileName = null;
 
-function logout(){currentUser=null;globalAdminData=[];location.reload();}
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                fileBase64 = await fileToBase64(file);
+                fileName = file.name;
+            }
 
-async function fetchAdminData(){
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('adminDashboard').classList.remove('hidden');
-    document.getElementById('adminTableBody').innerHTML='<tr><td colspan="5" class="text-center p-10"><div class="loading-spinner border-indigo-500 border-t-transparent mx-auto"></div><p class="mt-3 text-slate-400">Sedang menyegerak data...</p></td></tr>';
-    try{
-        const res=await fetch(`${CONFIG.GAS_URL}?action=getAllPelajar`);
-        const result=await res.json();
-        if(result.status==='success'){globalAdminData=result.data;renderAdminDashboard();}
-        else showToast("Gagal: "+result.message,"error");
-    }catch(e){showToast("Ralat sambungan ke GAS","error");}
-}
+            // Hantar secara payload JSON (POST Request) - PENTING UNTUK FAIL BESAR
+            const payload = {
+                action: 'updatePelajar', 
+                rowIdx: currentUser.rowIdx, 
+                status: document.getElementById('fStatus').value,
+                alamat: document.getElementById('fAlamat').value, 
+                telefon: document.getElementById('fTel').value,
+                alamatSyarikat: document.getElementById('fSyarikat').value, 
+                penyelia: document.getElementById('fPenyelia').value,
+                telefonSyarikat: document.getElementById('fTelSyarikat').value, 
+                mulaLI: document.getElementById('fMulaLI').value,
+                tamatLI: document.getElementById('fTamatLI').value, 
+                laporDiri: document.getElementById('fLaporDiri').value, 
+                elaun: document.getElementById('fElaun').value,
+                namaInstitusi: document.getElementById('fNamaInstitusi').value, 
+                alamatInstitusi: document.getElementById('fAlamatInstitusi').value,
+                tarikhDaftar: document.getElementById('fTarikhDaftar').value, 
+                namaKerja: document.getElementById('fNamaKerja').value,
+                alamatKerja: document.getElementById('fAlamatKerja').value, 
+                gajiKerja: document.getElementById('fGajiKerja').value,
+                
+                // Maklumat Gambar
+                fileBase64: fileBase64,
+                fileName: fileName,
+                buktiSediaAda: currentUser.buktiUrl
+            };
 
-function renderAdminDashboard(){
-    let cc=0;const uc=new Set();
-    globalAdminData.forEach(p=>{p.isComplete=isDataComplete(p);if(p.isComplete)cc++;if(p.kursus&&p.kursus.trim())uc.add(p.kursus.trim());});
-    document.getElementById('statTotal').innerText=globalAdminData.length;
-    document.getElementById('statComplete').innerText=cc;
-    document.getElementById('statIncomplete').innerText=globalAdminData.length-cc;
-    const sel=document.getElementById('courseFilter');
-    sel.innerHTML='<option value="all">Semua Kursus</option>';
-    [...uc].sort().forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c.length>40?c.substring(0,38)+'…':c;sel.appendChild(o);});
-    applyAdminFilters();
-}
+            try {
+                const res = await fetch(CONFIG.GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.status === 'success') { 
+                    showToast("Maklumat & Gambar Berjaya Disimpan!"); 
+                    // Update Local Data
+                    if (result.newBuktiUrl) currentUser.buktiUrl = result.newBuktiUrl;
+                    renderStudentDashboard();
+                } else {
+                    showToast("Ralat Menyimpan!", "error");
+                }
+            } catch (e) { showToast("Ralat Sistem", "error"); }
+            finally { btn.disabled = false; btn.innerText = "SIMPAN / KEMASKINI MAKLUMAT"; }
+        }
 
-function setCompletionFilter(f){
-    currentCompletionFilter=f;
-    ['fltAll','fltInc','fltCom'].forEach(id=>{document.getElementById(id).className='flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition';});
-    const aid=f==='all'?'fltAll':f==='incomplete'?'fltInc':'fltCom';
-    document.getElementById(aid).className='flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium bg-slate-600 text-white';
-    applyAdminFilters();
-}
+        async function fetchAdminData() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            try {
+                const res = await fetch(`${CONFIG.GAS_URL}?action=getAllPelajar`);
+                const result = await res.json();
+                if (result.status === 'success') { globalAdminData = result.data; renderAdminDashboard(); }
+            } catch (e) { alert("Ralat!"); }
+        }
 
-function applyAdminFilters(){
-    const course=document.getElementById('courseFilter').value;
-    const status=document.getElementById('statusFilterCombo').value;
-    let fd=globalAdminData;
-    if(currentCompletionFilter==='complete')fd=fd.filter(p=>p.isComplete);
-    if(currentCompletionFilter==='incomplete')fd=fd.filter(p=>!p.isComplete);
-    if(course!=='all')fd=fd.filter(p=>p.kursus&&p.kursus.trim()===course);
-    if(status!=='all')fd=fd.filter(p=>p.status&&p.status.trim()===status);
-    const tbody=document.getElementById('adminTableBody');
-    if(!fd.length){tbody.innerHTML='<tr><td colspan="5" class="text-center p-8 text-slate-400">Tiada rekod ditemui.</td></tr>';return;}
-    // FIXED: guna rowIdx sebagai key (bukan indexOf yang boleh berubah selepas filter)
-    tbody.innerHTML=fd.map((p,i)=>`<tr class="border-b border-slate-700 hover:bg-slate-800/30 transition">
-        <td class="p-3 align-top pt-4 text-slate-400">${p.bil||i+1}</td>
-        <td class="p-3 font-medium text-slate-200 uppercase"><div class="truncate max-w-[200px]" title="${p.nama}">${p.nama}</div><div class="text-[10px] text-slate-400 font-normal mt-0.5 truncate max-w-[200px]">${p.kursus}</div></td>
-        <td class="p-3 text-slate-300 align-top pt-4 text-xs font-bold">${p.status||'<i class="text-slate-500 font-normal">Belum Pilih</i>'}</td>
-        <td class="p-3 align-top pt-4">${p.isComplete?'<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold">LENGKAP</span>':'<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-bold">TAK LENGKAP</span>'}</td>
-        <td class="p-3 text-center align-top pt-4"><button onclick="openAdminEdit(${p.rowIdx})" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-semibold">EDIT</button></td>
-    </tr>`).join('');
-}
+        function renderAdminDashboard() {
+            const tbody = document.getElementById('adminTableBody');
+            let completeCount = 0;
 
-function toggleAdminViews(){
-    const s=document.getElementById('aEditStatus').value;
-    ['aEditSecLI','aEditSecBelajar','aEditSecKerja'].forEach(id=>document.getElementById(id).classList.add('hidden'));
-    if(s==='Latihan Industri')document.getElementById('aEditSecLI').classList.remove('hidden');
-    else if(s==='Sambung Belajar')document.getElementById('aEditSecBelajar').classList.remove('hidden');
-    else if(s==='Dapat Tawaran Kerja')document.getElementById('aEditSecKerja').classList.remove('hidden');
-}
+            const html = globalAdminData.map((p, i) => {
+                const isComp = isDataComplete(p);
+                if(isComp) completeCount++;
+                
+                const buktiBadge = p.buktiUrl ? `<a href="${p.buktiUrl}" target="_blank" class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded hover:bg-yellow-500/40">LIHAT</a>` : `<span class="text-xs text-slate-500">TIADA</span>`;
 
-// FIXED: find by rowIdx, bukan array index
-function openAdminEdit(rowIdx){
-    const p=globalAdminData.find(x=>x.rowIdx==rowIdx);
-    if(!p){showToast("Rekod tidak dijumpai","error");return;}
-    document.getElementById('aEditRowIdx').value=p.rowIdx;
-    document.getElementById('aEditNama').innerText=p.nama.toUpperCase();
-    document.getElementById('aEditNDP').innerText=`NDP: ${p.ndp} | IC: ${p.ic}`;
-    document.getElementById('aEditStatus').value=p.status||'';
-    document.getElementById('aEditAlamat').value=p.alamat||'';
-    document.getElementById('aEditTel').value=p.telefon||'';
-    document.getElementById('aEditSyarikat').value=p.alamatSyarikat||'';
-    document.getElementById('aEditPenyelia').value=p.penyelia||'';
-    document.getElementById('aEditTelSyarikat').value=p.telefonSyarikat||'';
-    document.getElementById('aEditElaun').value=p.elaun||'';
-    document.getElementById('aEditLaporDiri').value=p.laporDiri||''; // FIXED: yyyy-MM-dd terus
-    document.getElementById('aEditMulaLI').value=p.mulaLI||'';
-    document.getElementById('aEditTamatLI').value=p.tamatLI||'';
-    document.getElementById('aEditNamaInstitusi').value=p.namaInstitusi||'';
-    document.getElementById('aEditAlamatInstitusi').value=p.alamatInstitusi||'';
-    document.getElementById('aEditTarikhDaftar').value=p.tarikhDaftar||'';
-    document.getElementById('aEditNamaKerja').value=p.namaKerja||'';
-    document.getElementById('aEditAlamatKerja').value=p.alamatKerja||'';
-    document.getElementById('aEditGajiKerja').value=p.gajiKerja||'';
-    toggleAdminViews();
-    document.getElementById('adminEditModal').classList.remove('hidden');
-}
-function closeAdminEdit(){document.getElementById('adminEditModal').classList.add('hidden');}
+                return `
+                <tr class="border-b border-slate-700">
+                    <td class="p-3">${i+1}</td><td class="p-3">${p.nama}</td><td class="p-3 text-xs">${p.status || '-'}</td>
+                    <td class="p-3">${buktiBadge}</td>
+                    <td class="p-3"><span class="text-xs px-2 rounded ${isComp ? 'bg-green-500/20 text-green-400':'bg-red-500/20 text-red-400'}">${isComp ? 'LENGKAP':'TAK LENGKAP'}</span></td>
+                    <td class="p-3 text-center"><button onclick="openAdminEdit(${i})" class="text-blue-400 font-bold hover:text-blue-300">Edit</button></td>
+                </tr>`;
+            }).join('');
+            
+            tbody.innerHTML = html;
+            document.getElementById('statTotal').innerText = globalAdminData.length;
+            document.getElementById('statComplete').innerText = completeCount;
+            document.getElementById('statIncomplete').innerText = globalAdminData.length - completeCount;
+        }
 
-async function saveAdminEdit(){
-    const btn=document.getElementById('btnAdminSave');btn.disabled=true;btn.innerHTML='<div class="loading-spinner border-2 h-4 w-4"></div>';
-    const payload={action:'updatePelajar',rowIdx:document.getElementById('aEditRowIdx').value,status:document.getElementById('aEditStatus').value,
-        alamat:document.getElementById('aEditAlamat').value,telefon:document.getElementById('aEditTel').value,
-        alamatSyarikat:document.getElementById('aEditSyarikat').value,penyelia:document.getElementById('aEditPenyelia').value,
-        telefonSyarikat:document.getElementById('aEditTelSyarikat').value,mulaLI:document.getElementById('aEditMulaLI').value,
-        tamatLI:document.getElementById('aEditTamatLI').value,laporDiri:document.getElementById('aEditLaporDiri').value,
-        elaun:document.getElementById('aEditElaun').value,namaInstitusi:document.getElementById('aEditNamaInstitusi').value,
-        alamatInstitusi:document.getElementById('aEditAlamatInstitusi').value,tarikhDaftar:document.getElementById('aEditTarikhDaftar').value,
-        namaKerja:document.getElementById('aEditNamaKerja').value,alamatKerja:document.getElementById('aEditAlamatKerja').value,
-        gajiKerja:document.getElementById('aEditGajiKerja').value};
-    try{
-        const res=await fetch(`${CONFIG.GAS_URL}?${new URLSearchParams(payload).toString()}`);
-        const result=await res.json();
-        if(result.status==='success'){showToast("Rekod Berjaya Dikemaskini!");closeAdminEdit();await fetchAdminData();}
-        else showToast("Gagal: "+(result.message||'Ralat'),"error");
-    }catch(e){showToast("Ralat Menyimpan","error");}
-    finally{btn.disabled=false;btn.innerText="Simpan";}
-}
+        function isDataComplete(p) { return p.status && p.alamat && p.telefon; }
+        function formatDateForInput(d) { if(!d) return ''; return new Date(d).toISOString().split('T')[0]; }
+        function logout() { location.reload(); }
 
-let currentPin='';
-function openKeypad(){currentPin='';updatePinDots();document.getElementById('pinErrorText').innerText='';const m=document.getElementById('keypadModal');m.classList.remove('hidden');setTimeout(()=>m.firstElementChild.classList.remove('scale-95'),10);}
-function closeKeypad(){const m=document.getElementById('keypadModal');m.firstElementChild.classList.add('scale-95');setTimeout(()=>m.classList.add('hidden'),300);}
-function clearPin(){currentPin='';updatePinDots();document.getElementById('pinErrorText').innerText='';}
-function pressPin(n){if(currentPin.length<4){currentPin+=n;updatePinDots();}if(currentPin.length===4)setTimeout(verifyAdmin,200);}
-function updatePinDots(){const d=document.getElementById('pinDots').children;for(let i=0;i<4;i++){if(i<currentPin.length){d[i].classList.add('bg-indigo-500','border-indigo-500');d[i].classList.remove('border-slate-600');}else{d[i].classList.remove('bg-indigo-500','border-indigo-500');d[i].classList.add('border-slate-600');}}}
-function verifyAdmin(){if(currentPin===CONFIG.ADMIN_PIN){closeKeypad();fetchAdminData();}else{document.getElementById('pinErrorText').innerText='Kod Salah. Cuba lagi.';currentPin='';updatePinDots();}}
-</script>
+        let currentPin = '';
+        function openKeypad() { currentPin = ''; updatePinDots(); document.getElementById('keypadModal').classList.remove('hidden'); }
+        function closeKeypad() { document.getElementById('keypadModal').classList.add('hidden'); }
+        function pressPin(n) { if(currentPin.length < 4) currentPin += n; updatePinDots(); if(currentPin.length === 4) verifyAdmin(); }
+        function updatePinDots() { const dots = document.getElementById('pinDots').children; for(let i=0; i<4; i++) dots[i].className = i < currentPin.length ? 'w-4 h-4 rounded-full bg-blue-500' : 'w-4 h-4 rounded-full border-2 border-slate-600'; }
+        function verifyAdmin() { if(currentPin === CONFIG.ADMIN_PIN) { closeKeypad(); fetchAdminData(); } else { alert("PIN Salah!"); currentPin = ''; updatePinDots(); } }
+        function clearPin() { currentPin = ''; updatePinDots(); }
+
+        // ADMIN EDIT FUNCTIONS
+        function toggleAdminViews() {
+            const status = document.getElementById('aEditStatus').value;
+            document.getElementById('aEditSecLI').classList.add('hidden');
+            document.getElementById('aEditSecBelajar').classList.add('hidden');
+            document.getElementById('aEditSecKerja').classList.add('hidden');
+
+            if (status === 'Latihan Industri') document.getElementById('aEditSecLI').classList.remove('hidden');
+            else if (status === 'Sambung Belajar') document.getElementById('aEditSecBelajar').classList.remove('hidden');
+            else if (status === 'Dapat Tawaran Kerja') document.getElementById('aEditSecKerja').classList.remove('hidden');
+        }
+
+        function openAdminEdit(index) {
+            const p = globalAdminData[index];
+            document.getElementById('aEditRowIdx').value = p.rowIdx;
+            document.getElementById('aEditNama').innerText = p.nama.toUpperCase();
+            document.getElementById('aEditNDP').innerText = `NDP: ${p.ndp} | IC: ${p.ic}`;
+            document.getElementById('aEditStatus').value = p.status || '';
+            document.getElementById('aEditAlamat').value = p.alamat || '';
+            document.getElementById('aEditTel').value = p.telefon || '';
+            document.getElementById('aEditSyarikat').value = p.alamatSyarikat || '';
+            document.getElementById('aEditPenyelia').value = p.penyelia || '';
+            document.getElementById('aEditTelSyarikat').value = p.telefonSyarikat || '';
+            document.getElementById('aEditElaun').value = p.elaun || '';
+            document.getElementById('aEditLaporDiri').value = formatDateForInput(p.laporDiri);
+            document.getElementById('aEditMulaLI').value = formatDateForInput(p.mulaLI);
+            document.getElementById('aEditTamatLI').value = formatDateForInput(p.tamatLI);
+            document.getElementById('aEditNamaInstitusi').value = p.namaInstitusi || '';
+            document.getElementById('aEditAlamatInstitusi').value = p.alamatInstitusi || '';
+            document.getElementById('aEditTarikhDaftar').value = formatDateForInput(p.tarikhDaftar);
+            document.getElementById('aEditNamaKerja').value = p.namaKerja || '';
+            document.getElementById('aEditAlamatKerja').value = p.alamatKerja || '';
+            document.getElementById('aEditGajiKerja').value = p.gajiKerja || '';
+
+            // Papar Link Bukti Waktu Edit
+            if (p.buktiUrl) {
+                document.getElementById('aEditBuktiLink').href = p.buktiUrl;
+                document.getElementById('aEditBuktiLink').classList.remove('hidden');
+                document.getElementById('aEditTiadaBukti').classList.add('hidden');
+            } else {
+                document.getElementById('aEditBuktiLink').classList.add('hidden');
+                document.getElementById('aEditTiadaBukti').classList.remove('hidden');
+            }
+            document.getElementById('aEditBuktiSediaAda').value = p.buktiUrl || '';
+
+            toggleAdminViews();
+            document.getElementById('adminEditModal').classList.remove('hidden');
+        }
+
+        function closeAdminEdit() { document.getElementById('adminEditModal').classList.add('hidden'); }
+
+        async function saveAdminEdit() {
+            const btn = document.getElementById('btnAdminSave');
+            btn.disabled = true; btn.innerHTML = '<div class="loading-spinner border-2 h-4 w-4"></div>';
+            
+            const payload = {
+                action: 'updatePelajar', rowIdx: document.getElementById('aEditRowIdx').value,
+                status: document.getElementById('aEditStatus').value, alamat: document.getElementById('aEditAlamat').value,
+                telefon: document.getElementById('aEditTel').value, alamatSyarikat: document.getElementById('aEditSyarikat').value,
+                penyelia: document.getElementById('aEditPenyelia').value, telefonSyarikat: document.getElementById('aEditTelSyarikat').value,
+                mulaLI: document.getElementById('aEditMulaLI').value, tamatLI: document.getElementById('aEditTamatLI').value,
+                laporDiri: document.getElementById('aEditLaporDiri').value, elaun: document.getElementById('aEditElaun').value,
+                namaInstitusi: document.getElementById('aEditNamaInstitusi').value, alamatInstitusi: document.getElementById('aEditAlamatInstitusi').value,
+                tarikhDaftar: document.getElementById('aEditTarikhDaftar').value, namaKerja: document.getElementById('aEditNamaKerja').value,
+                alamatKerja: document.getElementById('aEditAlamatKerja').value, gajiKerja: document.getElementById('aEditGajiKerja').value,
+                
+                // Pastikan url bukti lama kekal di simpan
+                buktiSediaAda: document.getElementById('aEditBuktiSediaAda').value 
+            };
+
+            try {
+                const res = await fetch(CONFIG.GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const result = await res.json();
+                if (result.status === 'success') { showToast("Rekod Berjaya Dikemaskini!"); closeAdminEdit(); fetchAdminData(); }
+            } catch (e) { showToast("Ralat Menyimpan", "error"); } 
+            finally { btn.disabled = false; btn.innerText = "Simpan"; }
+        }
+    </script>
 </body>
 </html>
