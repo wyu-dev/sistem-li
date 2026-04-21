@@ -569,6 +569,53 @@
             margin-top: 10px;
         }
 
+
+        /* ── Admin Filter Bar ── */
+        .filter-bar {
+            background: var(--white);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .filter-bar input, .filter-bar select {
+            flex: 1;
+            min-width: 140px;
+            background: var(--gray-100);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-family: 'Barlow', sans-serif;
+            color: var(--black);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: var(--blue); }
+        .filter-bar input::placeholder { color: var(--gray-400); }
+        .filter-count {
+            font-size: 12px;
+            color: var(--gray-400);
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .btn-reset {
+            background: var(--gray-100);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Barlow', sans-serif;
+            color: var(--gray-600);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-reset:hover { border-color: var(--red); color: var(--red); }
         /* ── Spinner ── */
         .spinner {
             border: 3px solid rgba(0,0,0,0.1);
@@ -830,6 +877,31 @@
         </div>
     </div>
 
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <input type="text" id="fCarian" placeholder="🔍 Cari nama / NDP / No. IC..." oninput="applyFilter()">
+        <select id="fSesi" onchange="applyFilter()">
+            <option value="">Semua Sesi</option>
+        </select>
+        <select id="fKursus" onchange="applyFilter()">
+            <option value="">Semua Kursus</option>
+        </select>
+        <select id="fStatusFilter" onchange="applyFilter()">
+            <option value="">Semua Status</option>
+            <option value="Latihan Industri">Latihan Industri</option>
+            <option value="Sambung Belajar">Sambung Belajar</option>
+            <option value="Dapat Tawaran Kerja">Dapat Tawaran Kerja</option>
+            <option value="">Tiada Status</option>
+        </select>
+        <select id="fKelengkapan" onchange="applyFilter()">
+            <option value="">Semua Data</option>
+            <option value="lengkap">Lengkap</option>
+            <option value="tidak">Tidak Lengkap</option>
+        </select>
+        <span class="filter-count" id="filterCount"></span>
+        <button class="btn-reset" onclick="resetFilter()">Reset</button>
+    </div>
+
     <div class="table-wrap">
         <div style="overflow-x:auto">
             <table>
@@ -837,6 +909,8 @@
                     <tr>
                         <th>#</th>
                         <th>Nama</th>
+                        <th>Sesi</th>
+                        <th>Kursus</th>
                         <th>Status</th>
                         <th>Bukti</th>
                         <th>Data</th>
@@ -1178,26 +1252,95 @@
     }
 
     function renderAdminDashboard() {
-        const tbody = document.getElementById('adminTableBody');
+        // Populate filter dropdowns dari data sebenar
+        const sesiSet = [...new Set(globalAdminData.map(p => p.sesi).filter(Boolean))].sort();
+        const kursusSet = [...new Set(globalAdminData.map(p => p.kursus).filter(Boolean))].sort();
+
+        const fSesi = document.getElementById('fSesi');
+        const fKursus = document.getElementById('fKursus');
+        const curSesi = fSesi.value;
+        const curKursus = fKursus.value;
+
+        fSesi.innerHTML = '<option value="">Semua Sesi</option>' +
+            sesiSet.map(s => `<option value="${s}" ${s===curSesi?'selected':''}>${s}</option>`).join('');
+        fKursus.innerHTML = '<option value="">Semua Kursus</option>' +
+            kursusSet.map(k => `<option value="${k}" ${k===curKursus?'selected':''}>${k}</option>`).join('');
+
+        // Kira stats dari keseluruhan data (bukan filtered)
         let ok = 0;
-        tbody.innerHTML = globalAdminData.map((p, i) => {
-            const complete = p.status && p.alamat && p.telefon;
-            if (complete) ok++;
-            const bukti = p.buktiUrl
-                ? `<a href="${p.buktiUrl}" target="_blank" class="badge badge-bukti">LIHAT</a>`
-                : `<span style="color:var(--gray-400);font-size:12px">Tiada</span>`;
-            return `<tr>
-                <td style="color:var(--gray-400)">${i+1}</td>
-                <td style="font-weight:600">${p.nama}</td>
-                <td><span style="font-size:12px;color:var(--gray-600)">${p.status||'—'}</span></td>
-                <td>${bukti}</td>
-                <td><span class="badge ${complete?'badge-ok':'badge-no'}">${complete?'LENGKAP':'TIDAK'}</span></td>
-                <td style="text-align:center"><button class="btn-edit" onclick="openAdminEdit(${i})">Edit</button></td>
-            </tr>`;
-        }).join('');
+        globalAdminData.forEach(p => { if (p.status && p.alamat && p.telefon) ok++; });
         document.getElementById('statTotal').textContent = globalAdminData.length;
         document.getElementById('statComplete').textContent = ok;
         document.getElementById('statIncomplete').textContent = globalAdminData.length - ok;
+
+        applyFilter();
+    }
+
+    function applyFilter() {
+        const carian = (document.getElementById('fCarian').value || '').toLowerCase().trim();
+        const sesi = document.getElementById('fSesi').value;
+        const kursus = document.getElementById('fKursus').value;
+        const status = document.getElementById('fStatusFilter').value;
+        const kelengkapan = document.getElementById('fKelengkapan').value;
+
+        const filtered = globalAdminData.filter((p, i) => {
+            // Simpan index asal untuk openAdminEdit
+            p._idx = i;
+            const complete = !!(p.status && p.alamat && p.telefon);
+
+            if (carian) {
+                const haystack = `${p.nama} ${p.ndp} ${p.ic}`.toLowerCase();
+                if (!haystack.includes(carian)) return false;
+            }
+            if (sesi && p.sesi !== sesi) return false;
+            if (kursus && p.kursus !== kursus) return false;
+            if (status === '') {
+                // "Semua Status" — skip
+            } else if (status && p.status !== status) return false;
+            if (kelengkapan === 'lengkap' && !complete) return false;
+            if (kelengkapan === 'tidak' && complete) return false;
+
+            return true;
+        });
+
+        const tbody = document.getElementById('adminTableBody');
+        tbody.innerHTML = filtered.map((p, i) => {
+            const complete = !!(p.status && p.alamat && p.telefon);
+            const bukti = p.buktiUrl
+                ? `<a href="${p.buktiUrl}" target="_blank" class="badge badge-bukti">LIHAT</a>`
+                : `<span style="color:var(--gray-400);font-size:12px">Tiada</span>`;
+            // Highlight carian
+            const cariStr = document.getElementById('fCarian').value.trim();
+            const highlight = (str) => {
+                if (!cariStr || !str) return str || '—';
+                const re = new RegExp('(' + cariStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                return str.replace(re, '<mark style="background:var(--yellow);padding:0 2px;border-radius:2px">$1</mark>');
+            };
+            return `<tr>
+                <td style="color:var(--gray-400)">${i+1}</td>
+                <td style="font-weight:600">${highlight(p.nama)}</td>
+                <td style="font-size:12px;color:var(--gray-600)">${p.sesi||'—'}</td>
+                <td style="font-size:11px;color:var(--gray-600);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.kursus||''}">${p.kursus||'—'}</td>
+                <td><span style="font-size:12px;color:var(--gray-600)">${p.status||'—'}</span></td>
+                <td>${bukti}</td>
+                <td><span class="badge ${complete?'badge-ok':'badge-no'}">${complete?'LENGKAP':'TIDAK'}</span></td>
+                <td style="text-align:center"><button class="btn-edit" onclick="openAdminEdit(${p._idx})">Edit</button></td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('filterCount').textContent = 
+            filtered.length === globalAdminData.length 
+                ? `${globalAdminData.length} pelajar`
+                : `${filtered.length} / ${globalAdminData.length} pelajar`;
+    }
+
+    function resetFilter() {
+        document.getElementById('fCarian').value = '';
+        document.getElementById('fSesi').value = '';
+        document.getElementById('fKursus').value = '';
+        document.getElementById('fStatusFilter').value = '';
+        document.getElementById('fKelengkapan').value = '';
+        applyFilter();
     }
 
     function toggleAdminViews() {
