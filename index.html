@@ -16,16 +16,419 @@
 </head>
 <body class="min-h-screen">
 
-   <script>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-20 opacity-0 transition-all duration-500 z-50 glass px-6 py-3 rounded-full text-sm font-medium"></div>
+
+    <!-- ============================================================ -->
+    <!-- LOGIN SCREEN                                                  -->
+    <!-- ============================================================ -->
+    <div id="loginScreen" class="min-h-screen flex flex-col items-center justify-center px-4">
+        <div class="glass rounded-2xl p-8 w-full max-w-sm">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-white">Portal LI</h1>
+                <p class="text-slate-400 text-sm mt-1">ADTEC JTM Kampus Kuantan</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">No. Kad Pengenalan (IC)</label>
+                    <input id="inpIC" type="text" inputmode="numeric" placeholder="Contoh: 060519060347"
+                        class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">No. Daftar Pelajar (NDP)</label>
+                    <input id="inpNDP" type="password" inputmode="numeric" placeholder="Contoh: 07224008"
+                        onkeydown="if(event.key==='Enter')handleLogin()"
+                        class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+                <button id="btnLogin" onclick="handleLogin()"
+                    class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition">
+                    MASUK
+                </button>
+            </div>
+            <hr class="border-white/10 my-5">
+            <button onclick="openKeypad()" class="w-full text-slate-400 hover:text-white text-sm transition">
+                🔐 Log Masuk sebagai Admin
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- STUDENT DASHBOARD                                             -->
+    <!-- ============================================================ -->
+    <div id="studentDashboard" class="hidden min-h-screen p-4 max-w-2xl mx-auto">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-bold" id="studentName">Nama Pelajar</h2>
+                <p class="text-slate-400 text-sm" id="studentCourse">Kursus</p>
+            </div>
+            <button onclick="logout()" class="text-xs bg-red-500/20 text-red-400 px-3 py-2 rounded-lg hover:bg-red-500/30 transition">
+                Log Keluar
+            </button>
+        </div>
+
+        <!-- Maklumat Tetap (Read-Only) -->
+        <div class="glass rounded-xl p-4 mb-4 text-sm">
+            <p class="text-slate-400 text-xs mb-3 font-medium">MAKLUMAT PENDAFTARAN</p>
+            <div class="grid grid-cols-2 gap-2">
+                <div><span class="text-slate-500">IC:</span> <span id="dispIc" class="text-white"></span></div>
+                <div><span class="text-slate-500">NDP:</span> <span id="dispNdp" class="text-white"></span></div>
+                <div class="col-span-2"><span class="text-slate-500">Sesi:</span> <span id="dispSesi" class="text-white"></span></div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex gap-6 border-b border-white/10 mb-4">
+            <button id="btnTabPelajar" onclick="switchTab('tabPelajar')" class="pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition">
+                Maklumat Pelajar
+            </button>
+            <button id="btnTabSyarikat" onclick="switchTab('tabSyarikat')" class="hidden pb-2 border-b-2 border-transparent text-slate-400 transition">
+                Maklumat LI
+            </button>
+        </div>
+
+        <!-- TAB: Maklumat Pelajar -->
+        <div id="tabPelajar" class="space-y-4">
+            
+            <!-- Status -->
+            <div class="glass rounded-xl p-4">
+                <label class="text-xs text-slate-400 mb-2 block">STATUS SELEPAS TAMAT PENGAJIAN *</label>
+                <select id="fStatus" onchange="handleStatusChange()"
+                    class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-400">
+                    <option value="">-- Pilih Status --</option>
+                    <option value="Latihan Industri">Latihan Industri</option>
+                    <option value="Sambung Belajar">Sambung Belajar</option>
+                    <option value="Dapat Tawaran Kerja">Dapat Tawaran Kerja</option>
+                </select>
+            </div>
+
+            <!-- Alamat & Telefon -->
+            <div class="glass rounded-xl p-4 space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">ALAMAT RUMAH</label>
+                    <textarea id="fAlamat" rows="3" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">NO. TELEFON</label>
+                    <input id="fTel" type="tel" placeholder="01X-XXXXXXXX"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+            </div>
+
+            <!-- Sambung Belajar Section -->
+            <div id="secBelajar" class="hidden glass rounded-xl p-4 space-y-3">
+                <p class="text-xs text-slate-400 font-medium">MAKLUMAT INSTITUSI PENGAJIAN</p>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">NAMA INSTITUSI</label>
+                    <input id="fNamaInstitusi" type="text" placeholder="Contoh: UiTM Shah Alam"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">ALAMAT INSTITUSI</label>
+                    <textarea id="fAlamatInstitusi" rows="2" placeholder="Alamat institusi pengajian"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">TARIKH DAFTAR</label>
+                    <input id="fTarikhDaftar" type="date"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-400">
+                </div>
+            </div>
+
+            <!-- Dapat Kerja Section -->
+            <div id="secKerja" class="hidden glass rounded-xl p-4 space-y-3">
+                <p class="text-xs text-slate-400 font-medium">MAKLUMAT TAWARAN KERJA</p>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">NAMA MAJIKAN / SYARIKAT</label>
+                    <input id="fNamaKerja" type="text" placeholder="Nama syarikat"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">ALAMAT SYARIKAT</label>
+                    <textarea id="fAlamatKerja" rows="2" placeholder="Alamat syarikat"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">GAJI DITAWARKAN (RM)</label>
+                    <input id="fGajiKerja" type="number" placeholder="Contoh: 1800"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+            </div>
+
+            <!-- Upload Bukti (untuk Belajar & Kerja) -->
+            <div id="secBukti" class="hidden glass rounded-xl p-4 space-y-3">
+                <p class="text-xs text-slate-400 font-medium">BUKTI / DOKUMEN SOKONGAN</p>
+
+                <!-- Bukti sedia ada -->
+                <div id="buktiSediaAdaContainer" class="hidden">
+                    <a id="buktiPreviewSediaAda" href="#" target="_blank"
+                        class="inline-flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300 bg-yellow-500/10 px-3 py-2 rounded-lg">
+                        📎 Lihat Bukti Yang Telah Dihantar
+                    </a>
+                </div>
+
+                <!-- [FIX] Input accept PDF + gambar (kamera & gallery) -->
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">MUAT NAIK BUKTI BARU (Gambar / PDF, maks 3MB)</label>
+                    <input id="fBukti" type="file"
+                        accept="image/*,application/pdf"
+                        capture="environment"
+                        class="w-full text-sm text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+                    <p class="text-xs text-slate-500 mt-1">💡 Boleh pilih dari Galeri, ambil Gambar atau muat naik PDF</p>
+                </div>
+
+                <!-- Preview gambar -->
+                <div id="buktiPreviewContainer" class="hidden">
+                    <img id="buktiPreview" src="" alt="Preview" class="w-full max-h-48 object-contain rounded-lg border border-white/20">
+                </div>
+                <!-- Preview PDF name -->
+                <div id="pdfPreviewContainer" class="hidden">
+                    <div class="flex items-center gap-2 bg-slate-800 rounded-lg px-3 py-2">
+                        <span class="text-2xl">📄</span>
+                        <span id="pdfFileName" class="text-sm text-slate-300"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Maklumat LI -->
+        <div id="tabSyarikat" class="hidden space-y-4">
+            <div class="glass rounded-xl p-4 space-y-3">
+                <p class="text-xs text-slate-400 font-medium">MAKLUMAT TEMPAT LATIHAN INDUSTRI</p>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">ALAMAT SYARIKAT / TEMPAT LI</label>
+                    <textarea id="fSyarikat" rows="3" placeholder="Nama & Alamat Penuh Syarikat"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">NAMA PENYELIA (PIC)</label>
+                    <input id="fPenyelia" type="text" placeholder="Nama penyelia di syarikat"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">NO. TELEFON SYARIKAT</label>
+                    <input id="fTelSyarikat" type="tel" placeholder="03-XXXXXXXX"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">ELAUN BULANAN (RM)</label>
+                    <input id="fElaun" type="number" placeholder="Contoh: 600"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                </div>
+            </div>
+            <div class="glass rounded-xl p-4 space-y-3">
+                <p class="text-xs text-slate-400 font-medium">TARIKH LATIHAN INDUSTRI</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-400 mb-1 block">TARIKH LAPOR DIRI</label>
+                        <input id="fLaporDiri" type="date"
+                            class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-400">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 mb-1 block">MULA LI</label>
+                        <input id="fMulaLI" type="date"
+                            class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-400">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-xs text-slate-400 mb-1 block">TAMAT LI</label>
+                        <input id="fTamatLI" type="date"
+                            class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-400">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Butang Simpan -->
+        <button id="btnUpdate" onclick="handleUpdate()"
+            class="w-full mt-4 mb-8 bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition">
+            SIMPAN / KEMASKINI MAKLUMAT
+        </button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ADMIN DASHBOARD                                               -->
+    <!-- ============================================================ -->
+    <div id="adminDashboard" class="hidden min-h-screen p-4 max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold">Panel Admin</h2>
+            <button onclick="logout()" class="text-xs bg-red-500/20 text-red-400 px-3 py-2 rounded-lg">Log Keluar</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="glass rounded-xl p-3 text-center">
+                <div id="statTotal" class="text-2xl font-bold text-blue-400">-</div>
+                <div class="text-xs text-slate-400">Jumlah</div>
+            </div>
+            <div class="glass rounded-xl p-3 text-center">
+                <div id="statComplete" class="text-2xl font-bold text-green-400">-</div>
+                <div class="text-xs text-slate-400">Lengkap</div>
+            </div>
+            <div class="glass rounded-xl p-3 text-center">
+                <div id="statIncomplete" class="text-2xl font-bold text-red-400">-</div>
+                <div class="text-xs text-slate-400">Tak Lengkap</div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="glass rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-white/10 text-slate-400 text-xs">
+                            <th class="p-3 text-left">#</th>
+                            <th class="p-3 text-left">NAMA</th>
+                            <th class="p-3 text-left">STATUS</th>
+                            <th class="p-3 text-left">BUKTI</th>
+                            <th class="p-3 text-left">KELENGKAPAN</th>
+                            <th class="p-3 text-center">TINDAKAN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ADMIN EDIT MODAL                                              -->
+    <!-- ============================================================ -->
+    <div id="adminEditModal" class="hidden fixed inset-0 bg-black/80 z-40 overflow-y-auto">
+        <div class="glass-dark max-w-lg mx-auto mt-8 mb-8 rounded-2xl p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 id="aEditNama" class="font-bold text-lg"></h3>
+                    <p id="aEditNDP" class="text-xs text-slate-400"></p>
+                </div>
+                <button onclick="closeAdminEdit()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <input type="hidden" id="aEditRowIdx">
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">STATUS</label>
+                    <select id="aEditStatus" onchange="toggleAdminViews()"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none">
+                        <option value="">-- Pilih Status --</option>
+                        <option value="Latihan Industri">Latihan Industri</option>
+                        <option value="Sambung Belajar">Sambung Belajar</option>
+                        <option value="Dapat Tawaran Kerja">Dapat Tawaran Kerja</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">ALAMAT</label>
+                    <textarea id="aEditAlamat" rows="2"
+                        class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">TELEFON</label>
+                    <input id="aEditTel" type="tel" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none">
+                </div>
+
+                <!-- LI Section -->
+                <div id="aEditSecLI" class="hidden space-y-3">
+                    <div><label class="text-xs text-slate-400 mb-1 block">ALAMAT SYARIKAT</label>
+                        <textarea id="aEditSyarikat" rows="2" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none resize-none"></textarea></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">PENYELIA</label>
+                        <input id="aEditPenyelia" type="text" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">TEL SYARIKAT</label>
+                        <input id="aEditTelSyarikat" type="tel" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">ELAUN (RM)</label>
+                        <input id="aEditElaun" type="number" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">LAPOR DIRI</label>
+                        <input id="aEditLaporDiri" type="date" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">MULA LI</label>
+                        <input id="aEditMulaLI" type="date" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">TAMAT LI</label>
+                        <input id="aEditTamatLI" type="date" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                </div>
+
+                <!-- Sambung Belajar Section -->
+                <div id="aEditSecBelajar" class="hidden space-y-3">
+                    <div><label class="text-xs text-slate-400 mb-1 block">NAMA INSTITUSI</label>
+                        <input id="aEditNamaInstitusi" type="text" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">ALAMAT INSTITUSI</label>
+                        <textarea id="aEditAlamatInstitusi" rows="2" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none resize-none"></textarea></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">TARIKH DAFTAR</label>
+                        <input id="aEditTarikhDaftar" type="date" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                </div>
+
+                <!-- Dapat Kerja Section -->
+                <div id="aEditSecKerja" class="hidden space-y-3">
+                    <div><label class="text-xs text-slate-400 mb-1 block">NAMA MAJIKAN</label>
+                        <input id="aEditNamaKerja" type="text" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">ALAMAT KERJA</label>
+                        <textarea id="aEditAlamatKerja" rows="2" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none resize-none"></textarea></div>
+                    <div><label class="text-xs text-slate-400 mb-1 block">GAJI (RM)</label>
+                        <input id="aEditGajiKerja" type="number" class="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none"></div>
+                </div>
+
+                <!-- Bukti -->
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">BUKTI SEDIA ADA</label>
+                    <div class="flex items-center gap-3">
+                        <a id="aEditBuktiLink" href="#" target="_blank" class="text-sm text-yellow-400 hover:text-yellow-300">📎 Lihat Bukti</a>
+                        <span id="aEditTiadaBukti" class="text-sm text-slate-500">Tiada bukti</span>
+                    </div>
+                    <input type="hidden" id="aEditBuktiSediaAda">
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeAdminEdit()" class="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition">Batal</button>
+                <button id="btnAdminSave" onclick="saveAdminEdit()"
+                    class="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition flex items-center justify-center">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- KEYPAD MODAL (Admin PIN)                                      -->
+    <!-- ============================================================ -->
+    <div id="keypadModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+        <div class="glass-dark rounded-2xl p-6 w-72">
+            <h3 class="text-center font-bold mb-4">Masukkan PIN Admin</h3>
+            <div id="pinDots" class="flex justify-center gap-3 mb-6">
+                <div class="w-4 h-4 rounded-full border-2 border-slate-600"></div>
+                <div class="w-4 h-4 rounded-full border-2 border-slate-600"></div>
+                <div class="w-4 h-4 rounded-full border-2 border-slate-600"></div>
+                <div class="w-4 h-4 rounded-full border-2 border-slate-600"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-3">
+                <button onclick="pressPin('1')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">1</button>
+                <button onclick="pressPin('2')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">2</button>
+                <button onclick="pressPin('3')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">3</button>
+                <button onclick="pressPin('4')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">4</button>
+                <button onclick="pressPin('5')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">5</button>
+                <button onclick="pressPin('6')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">6</button>
+                <button onclick="pressPin('7')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">7</button>
+                <button onclick="pressPin('8')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">8</button>
+                <button onclick="pressPin('9')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">9</button>
+                <button onclick="clearPin()" class="py-4 text-sm bg-white/5 rounded-xl hover:bg-white/10 transition text-slate-400">PADAM</button>
+                <button onclick="pressPin('0')" class="py-4 text-xl font-bold bg-white/10 rounded-xl hover:bg-white/20 transition">0</button>
+                <button onclick="closeKeypad()" class="py-4 text-sm bg-white/5 rounded-xl hover:bg-white/10 transition text-slate-400">BATAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT                                                     -->
+    <!-- ============================================================ -->
+    <script>
         const CONFIG = {
-            GAS_URL: "https://script.google.com/macros/s/AKfycbwuzjqPWL32BXsmli3DCvoCsWrUex3qsP3OmRwQ8Hy9DTbEBevpFAI1gt8m-1Rms9y5Qw/exec", // <-- GANTI DENGAN NEW DEPLOYMENT
+            GAS_URL: "https://script.google.com/macros/s/AKfycby-kLk0N_YyXJ-6bh-Sb6X25kh2oqedePaN91KQOtrzb4ZRVcOeeKobihhq3COwmKdOIw/exec",
             ADMIN_PIN: "5547",
-            TOKEN: "ADTEC2026" // <-- TOKEN KESELAMATAN BAHARU
+            TOKEN: "ADTEC2026"
         };
 
         let currentUser = null;
         let globalAdminData = [];
 
+        // ─── Toast ────────────────────────────────────────────────
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
@@ -34,26 +437,32 @@
             setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 4000);
         }
 
+        // ─── Login ────────────────────────────────────────────────
         async function handleLogin() {
-            const ic = document.getElementById('inpIC').value;
-            const ndp = document.getElementById('inpNDP').value;
-            if (!ic || !ndp) return;
-            document.getElementById('btnLogin').innerHTML = '<div class="loading-spinner"></div>';
+            const ic = document.getElementById('inpIC').value.trim();
+            const ndp = document.getElementById('inpNDP').value.trim();
+            if (!ic || !ndp) { showToast("Sila isi IC dan NDP", "error"); return; }
+            const btn = document.getElementById('btnLogin');
+            btn.innerHTML = '<div class="loading-spinner"></div>';
+            btn.disabled = true;
             try {
-                // Hantar TOKEN dalam GET parameter
                 const res = await fetch(`${CONFIG.GAS_URL}?action=login&ic=${ic}&ndp=${ndp}&token=${CONFIG.TOKEN}`);
                 const result = await res.json();
                 if (result.status === 'success') {
                     currentUser = result.data;
                     renderStudentDashboard();
                 } else {
-                    alert(result.message);
+                    showToast(result.message || "IC atau NDP tidak dijumpai", "error");
                 }
-            } catch (e) { alert("Ralat Sambungan!"); }
-            finally { document.getElementById('btnLogin').innerText = "MASUK"; }
+            } catch (e) {
+                showToast("Ralat Sambungan! Semak internet anda.", "error");
+            } finally {
+                btn.innerHTML = 'MASUK';
+                btn.disabled = false;
+            }
         }
 
-        // --- Fungsi Tab, Render, Change Status (Kekal sama dengan V3) ---
+        // ─── Tab & Status Logic ───────────────────────────────────
         function handleStatusChange() {
             const status = document.getElementById('fStatus').value;
             const tabLI = document.getElementById('btnTabSyarikat');
@@ -66,18 +475,28 @@
             secKerja.classList.add('hidden');
             secBukti.classList.add('hidden');
 
-            if (status === 'Latihan Industri') { tabLI.classList.remove('hidden'); } 
-            else if (status === 'Sambung Belajar') { secBelajar.classList.remove('hidden'); secBukti.classList.remove('hidden'); switchTab('tabPelajar'); } 
-            else if (status === 'Dapat Tawaran Kerja') { secKerja.classList.remove('hidden'); secBukti.classList.remove('hidden'); switchTab('tabPelajar'); }
+            if (status === 'Latihan Industri') {
+                tabLI.classList.remove('hidden');
+            } else if (status === 'Sambung Belajar') {
+                secBelajar.classList.remove('hidden');
+                secBukti.classList.remove('hidden');
+                switchTab('tabPelajar');
+            } else if (status === 'Dapat Tawaran Kerja') {
+                secKerja.classList.remove('hidden');
+                secBukti.classList.remove('hidden');
+                switchTab('tabPelajar');
+            }
         }
 
         function switchTab(tabId) {
-            const tP = document.getElementById('tabPelajar'), tS = document.getElementById('tabSyarikat');
-            const bP = document.getElementById('btnTabPelajar'), bS = document.getElementById('btnTabSyarikat');
+            const tP = document.getElementById('tabPelajar');
+            const tS = document.getElementById('tabSyarikat');
+            const bP = document.getElementById('btnTabPelajar');
+            const bS = document.getElementById('btnTabSyarikat');
             if (tabId === 'tabPelajar') {
                 tP.classList.remove('hidden'); tS.classList.add('hidden');
                 bP.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
-                if(!bS.classList.contains('hidden')) bS.className = 'pb-2 border-b-2 border-transparent text-slate-400 transition';
+                bS.className = 'hidden pb-2 border-b-2 border-transparent text-slate-400 transition';
             } else {
                 tS.classList.remove('hidden'); tP.classList.add('hidden');
                 bS.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 font-bold transition';
@@ -85,42 +504,68 @@
             }
         }
 
-        document.getElementById('fBukti').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Frontend Validation: Size limit 3MB sebelum hantar ke GAS
-                if(file.size > 3 * 1024 * 1024) {
-                    showToast("Saiz fail melebihi 3MB. Sila kecilkan gambar.", "error");
-                    e.target.value = ""; // Reset input
+        // [FIX] File input — setup SELEPAS DOM ready, handle PDF + gambar
+        // Ini dilakukan di bawah dalam DOMContentLoaded
+        function setupFileInput() {
+            const fileInput = document.getElementById('fBukti');
+            if (!fileInput) return;
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const previewImg = document.getElementById('buktiPreviewContainer');
+                const previewPdf = document.getElementById('pdfPreviewContainer');
+                previewImg.classList.add('hidden');
+                previewPdf.classList.add('hidden');
+
+                if (!file) return;
+
+                // Semak saiz fail (3MB)
+                if (file.size > 3 * 1024 * 1024) {
+                    showToast("Saiz fail melebihi 3MB. Sila kecilkan.", "error");
+                    e.target.value = "";
                     return;
                 }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('buktiPreview').src = e.target.result;
-                    document.getElementById('buktiPreviewContainer').classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
-        });
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+                if (file.type === 'application/pdf') {
+                    // [NEW] Preview untuk PDF
+                    document.getElementById('pdfFileName').innerText = '📄 ' + file.name;
+                    previewPdf.classList.remove('hidden');
+                } else {
+                    // Preview untuk gambar
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        document.getElementById('buktiPreview').src = ev.target.result;
+                        previewImg.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
 
+        // [FIX] formatDateForInput — guna string terus (GAS sudah return yyyy-MM-dd)
+        // JANGAN guna new Date().toISOString() kerana akan shift timezone
+        function formatDateForInput(d) {
+            if (!d) return '';
+            // GAS return yyyy-MM-dd terus — guna terus tanpa parse
+            if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+            // Fallback: cuba parse tapi guna kaedah selamat
+            const s = d.toString().trim();
+            if (s === '') return '';
+            const match = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+            return '';
+        }
+
+        // ─── Render Student Dashboard ─────────────────────────────
         function renderStudentDashboard() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('studentDashboard').classList.remove('hidden');
-            document.getElementById('studentName').innerText = currentUser.nama;
-            document.getElementById('studentCourse').innerText = currentUser.kursus;
-            document.getElementById('dispIc').innerText = currentUser.ic;
-            document.getElementById('dispNdp').innerText = currentUser.ndp;
-            document.getElementById('dispSesi').innerText = currentUser.sesi || '-';
             
+            document.getElementById('studentName').innerText = currentUser.nama || '';
+            document.getElementById('studentCourse').innerText = currentUser.kursus || '';
+            document.getElementById('dispIc').innerText = currentUser.ic || '';
+            document.getElementById('dispNdp').innerText = currentUser.ndp || '';
+            document.getElementById('dispSesi').innerText = currentUser.sesi || '-';
+
             document.getElementById('fStatus').value = currentUser.status || '';
             document.getElementById('fAlamat').value = currentUser.alamat || '';
             document.getElementById('fTel').value = currentUser.telefon || '';
@@ -147,89 +592,131 @@
             handleStatusChange();
         }
 
+        // ─── Handle Update ────────────────────────────────────────
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         async function handleUpdate() {
             const btn = document.getElementById('btnUpdate');
-            btn.disabled = true; btn.innerHTML = '<div class="loading-spinner border-2 h-4 w-4"></div> MENGHANTAR DATA...';
-            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner border-2 h-5 w-5"></div> <span>MENGHANTAR DATA...</span>';
+
             const fileInput = document.getElementById('fBukti');
             let fileBase64 = null;
             let fileName = null;
 
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                fileBase64 = await fileToBase64(file);
-                // Nama fail selamat format: NDP_NAMAFAIL.jpg
-                fileName = `${currentUser.ndp}_${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
+                try {
+                    fileBase64 = await fileToBase64(file);
+                    fileName = `${currentUser.ndp}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+                } catch(e) {
+                    showToast("Gagal baca fail. Cuba lagi.", "error");
+                    btn.disabled = false;
+                    btn.innerText = "SIMPAN / KEMASKINI MAKLUMAT";
+                    return;
+                }
             }
 
             const payload = {
-                action: 'updatePelajar', 
-                token: CONFIG.TOKEN, // <-- HANTAR TOKEN DI SINI
-                rowIdx: currentUser.rowIdx, 
-                ndp: currentUser.ndp, // Dihantar untuk bantu penamaan fail
+                action: 'updatePelajar',
+                token: CONFIG.TOKEN,
+                rowIdx: currentUser.rowIdx,
+                ndp: currentUser.ndp,
                 status: document.getElementById('fStatus').value,
-                alamat: document.getElementById('fAlamat').value, 
+                alamat: document.getElementById('fAlamat').value,
                 telefon: document.getElementById('fTel').value,
-                alamatSyarikat: document.getElementById('fSyarikat').value, 
+                alamatSyarikat: document.getElementById('fSyarikat').value,
                 penyelia: document.getElementById('fPenyelia').value,
-                telefonSyarikat: document.getElementById('fTelSyarikat').value, 
+                telefonSyarikat: document.getElementById('fTelSyarikat').value,
                 mulaLI: document.getElementById('fMulaLI').value,
-                tamatLI: document.getElementById('fTamatLI').value, 
-                laporDiri: document.getElementById('fLaporDiri').value, 
+                tamatLI: document.getElementById('fTamatLI').value,
+                laporDiri: document.getElementById('fLaporDiri').value,
                 elaun: document.getElementById('fElaun').value,
-                namaInstitusi: document.getElementById('fNamaInstitusi').value, 
+                namaInstitusi: document.getElementById('fNamaInstitusi').value,
                 alamatInstitusi: document.getElementById('fAlamatInstitusi').value,
-                tarikhDaftar: document.getElementById('fTarikhDaftar').value, 
+                tarikhDaftar: document.getElementById('fTarikhDaftar').value,
                 namaKerja: document.getElementById('fNamaKerja').value,
-                alamatKerja: document.getElementById('fAlamatKerja').value, 
+                alamatKerja: document.getElementById('fAlamatKerja').value,
                 gajiKerja: document.getElementById('fGajiKerja').value,
                 fileBase64: fileBase64,
                 fileName: fileName,
-                buktiSediaAda: currentUser.buktiUrl
+                buktiSediaAda: currentUser.buktiUrl || ''
             };
 
             try {
-                const res = await fetch(CONFIG.GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const res = await fetch(CONFIG.GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
                 const result = await res.json();
-                if (result.status === 'success') { 
-                    showToast("Maklumat & Gambar Berjaya Disimpan!"); 
+                if (result.status === 'success') {
+                    showToast("Maklumat Berjaya Disimpan! ✅");
                     if (result.newBuktiUrl) currentUser.buktiUrl = result.newBuktiUrl;
+                    // Update currentUser dengan data baru
+                    Object.assign(currentUser, {
+                        status: payload.status, alamat: payload.alamat, telefon: payload.telefon,
+                        alamatSyarikat: payload.alamatSyarikat, penyelia: payload.penyelia,
+                        telefonSyarikat: payload.telefonSyarikat, mulaLI: payload.mulaLI,
+                        tamatLI: payload.tamatLI, laporDiri: payload.laporDiri, elaun: payload.elaun,
+                        namaInstitusi: payload.namaInstitusi, alamatInstitusi: payload.alamatInstitusi,
+                        tarikhDaftar: payload.tarikhDaftar, namaKerja: payload.namaKerja,
+                        alamatKerja: payload.alamatKerja, gajiKerja: payload.gajiKerja
+                    });
                     renderStudentDashboard();
                 } else {
-                    showToast(result.message || "Ralat Menyimpan!", "error");
+                    // [FIX] Tunjuk error message dari GAS, bukan generic
+                    showToast("Ralat: " + (result.message || "Gagal menyimpan"), "error");
                 }
-            } catch (e) { showToast("Ralat Sistem", "error"); }
-            finally { btn.disabled = false; btn.innerText = "SIMPAN / KEMASKINI MAKLUMAT"; }
+            } catch (e) {
+                showToast("Ralat Sambungan ke GAS!", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "SIMPAN / KEMASKINI MAKLUMAT";
+            }
         }
 
+        // ─── Admin ────────────────────────────────────────────────
         async function fetchAdminData() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('adminDashboard').classList.remove('hidden');
             try {
                 const res = await fetch(`${CONFIG.GAS_URL}?action=getAllPelajar&token=${CONFIG.TOKEN}`);
                 const result = await res.json();
-                if (result.status === 'success') { globalAdminData = result.data; renderAdminDashboard(); }
-            } catch (e) { alert("Ralat!"); }
+                if (result.status === 'success') {
+                    globalAdminData = result.data;
+                    renderAdminDashboard();
+                }
+            } catch (e) {
+                showToast("Ralat memuatkan data admin", "error");
+            }
         }
 
-        // --- Semua fungsi Admin Edit dan lain-lain di bawah ini kekal sama seperti V3 ---
         function renderAdminDashboard() {
             const tbody = document.getElementById('adminTableBody');
             let completeCount = 0;
-
             const html = globalAdminData.map((p, i) => {
                 const isComp = isDataComplete(p);
-                if(isComp) completeCount++;
-                const buktiBadge = p.buktiUrl ? `<a href="${p.buktiUrl}" target="_blank" class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded hover:bg-yellow-500/40">LIHAT</a>` : `<span class="text-xs text-slate-500">TIADA</span>`;
+                if (isComp) completeCount++;
+                const buktiBadge = p.buktiUrl
+                    ? `<a href="${p.buktiUrl}" target="_blank" class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded hover:bg-yellow-500/40">LIHAT</a>`
+                    : `<span class="text-xs text-slate-500">TIADA</span>`;
                 return `
-                <tr class="border-b border-slate-700">
-                    <td class="p-3">${i+1}</td><td class="p-3">${p.nama}</td><td class="p-3 text-xs">${p.status || '-'}</td>
+                <tr class="border-b border-slate-700 hover:bg-white/5">
+                    <td class="p-3 text-slate-400">${i+1}</td>
+                    <td class="p-3 text-sm">${p.nama}</td>
+                    <td class="p-3 text-xs text-slate-300">${p.status || '-'}</td>
                     <td class="p-3">${buktiBadge}</td>
-                    <td class="p-3"><span class="text-xs px-2 rounded ${isComp ? 'bg-green-500/20 text-green-400':'bg-red-500/20 text-red-400'}">${isComp ? 'LENGKAP':'TAK LENGKAP'}</span></td>
-                    <td class="p-3 text-center"><button onclick="openAdminEdit(${i})" class="text-blue-400 font-bold hover:text-blue-300">Edit</button></td>
+                    <td class="p-3"><span class="text-xs px-2 py-1 rounded ${isComp ? 'bg-green-500/20 text-green-400':'bg-red-500/20 text-red-400'}">${isComp ? 'LENGKAP':'TAK LENGKAP'}</span></td>
+                    <td class="p-3 text-center"><button onclick="openAdminEdit(${i})" class="text-blue-400 text-sm font-bold hover:text-blue-300">Edit</button></td>
                 </tr>`;
             }).join('');
-            
             tbody.innerHTML = html;
             document.getElementById('statTotal').innerText = globalAdminData.length;
             document.getElementById('statComplete').innerText = completeCount;
@@ -237,22 +724,12 @@
         }
 
         function isDataComplete(p) { return p.status && p.alamat && p.telefon; }
-        function formatDateForInput(d) { if(!d) return ''; return new Date(d).toISOString().split('T')[0]; }
-        function logout() { location.reload(); }
-
-        let currentPin = '';
-        function openKeypad() { currentPin = ''; updatePinDots(); document.getElementById('keypadModal').classList.remove('hidden'); }
-        function closeKeypad() { document.getElementById('keypadModal').classList.add('hidden'); }
-        function pressPin(n) { if(currentPin.length < 4) currentPin += n; updatePinDots(); if(currentPin.length === 4) verifyAdmin(); }
-        function updatePinDots() { const dots = document.getElementById('pinDots').children; for(let i=0; i<4; i++) dots[i].className = i < currentPin.length ? 'w-4 h-4 rounded-full bg-blue-500' : 'w-4 h-4 rounded-full border-2 border-slate-600'; }
-        function verifyAdmin() { if(currentPin === CONFIG.ADMIN_PIN) { closeKeypad(); fetchAdminData(); } else { alert("PIN Salah!"); currentPin = ''; updatePinDots(); } }
-        function clearPin() { currentPin = ''; updatePinDots(); }
 
         function toggleAdminViews() {
             const status = document.getElementById('aEditStatus').value;
-            document.getElementById('aEditSecLI').classList.add('hidden');
-            document.getElementById('aEditSecBelajar').classList.add('hidden');
-            document.getElementById('aEditSecKerja').classList.add('hidden');
+            ['aEditSecLI', 'aEditSecBelajar', 'aEditSecKerja'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
             if (status === 'Latihan Industri') document.getElementById('aEditSecLI').classList.remove('hidden');
             else if (status === 'Sambung Belajar') document.getElementById('aEditSecBelajar').classList.remove('hidden');
             else if (status === 'Dapat Tawaran Kerja') document.getElementById('aEditSecKerja').classList.remove('hidden');
@@ -261,7 +738,7 @@
         function openAdminEdit(index) {
             const p = globalAdminData[index];
             document.getElementById('aEditRowIdx').value = p.rowIdx;
-            document.getElementById('aEditNama').innerText = p.nama.toUpperCase();
+            document.getElementById('aEditNama').innerText = (p.nama || '').toUpperCase();
             document.getElementById('aEditNDP').innerText = `NDP: ${p.ndp} | IC: ${p.ic}`;
             document.getElementById('aEditStatus').value = p.status || '';
             document.getElementById('aEditAlamat').value = p.alamat || '';
@@ -289,37 +766,86 @@
                 document.getElementById('aEditTiadaBukti').classList.remove('hidden');
             }
             document.getElementById('aEditBuktiSediaAda').value = p.buktiUrl || '';
-
             toggleAdminViews();
             document.getElementById('adminEditModal').classList.remove('hidden');
         }
 
-        function closeAdminEdit() { document.getElementById('adminEditModal').classList.add('hidden'); }
+        function closeAdminEdit() {
+            document.getElementById('adminEditModal').classList.add('hidden');
+        }
 
         async function saveAdminEdit() {
             const btn = document.getElementById('btnAdminSave');
-            btn.disabled = true; btn.innerHTML = '<div class="loading-spinner border-2 h-4 w-4"></div>';
-            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner border-2 h-4 w-4"></div>';
             const payload = {
-                action: 'updatePelajar', 
-                token: CONFIG.TOKEN, // <-- HANTAR TOKEN DI SINI
+                action: 'updatePelajar',
+                token: CONFIG.TOKEN,
                 rowIdx: document.getElementById('aEditRowIdx').value,
-                status: document.getElementById('aEditStatus').value, alamat: document.getElementById('aEditAlamat').value,
-                telefon: document.getElementById('aEditTel').value, alamatSyarikat: document.getElementById('aEditSyarikat').value,
-                penyelia: document.getElementById('aEditPenyelia').value, telefonSyarikat: document.getElementById('aEditTelSyarikat').value,
-                mulaLI: document.getElementById('aEditMulaLI').value, tamatLI: document.getElementById('aEditTamatLI').value,
-                laporDiri: document.getElementById('aEditLaporDiri').value, elaun: document.getElementById('aEditElaun').value,
-                namaInstitusi: document.getElementById('aEditNamaInstitusi').value, alamatInstitusi: document.getElementById('aEditAlamatInstitusi').value,
-                tarikhDaftar: document.getElementById('aEditTarikhDaftar').value, namaKerja: document.getElementById('aEditNamaKerja').value,
-                alamatKerja: document.getElementById('aEditAlamatKerja').value, gajiKerja: document.getElementById('aEditGajiKerja').value,
-                buktiSediaAda: document.getElementById('aEditBuktiSediaAda').value 
+                status: document.getElementById('aEditStatus').value,
+                alamat: document.getElementById('aEditAlamat').value,
+                telefon: document.getElementById('aEditTel').value,
+                alamatSyarikat: document.getElementById('aEditSyarikat').value,
+                penyelia: document.getElementById('aEditPenyelia').value,
+                telefonSyarikat: document.getElementById('aEditTelSyarikat').value,
+                mulaLI: document.getElementById('aEditMulaLI').value,
+                tamatLI: document.getElementById('aEditTamatLI').value,
+                laporDiri: document.getElementById('aEditLaporDiri').value,
+                elaun: document.getElementById('aEditElaun').value,
+                namaInstitusi: document.getElementById('aEditNamaInstitusi').value,
+                alamatInstitusi: document.getElementById('aEditAlamatInstitusi').value,
+                tarikhDaftar: document.getElementById('aEditTarikhDaftar').value,
+                namaKerja: document.getElementById('aEditNamaKerja').value,
+                alamatKerja: document.getElementById('aEditAlamatKerja').value,
+                gajiKerja: document.getElementById('aEditGajiKerja').value,
+                buktiSediaAda: document.getElementById('aEditBuktiSediaAda').value
             };
-
             try {
                 const res = await fetch(CONFIG.GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
-                if (result.status === 'success') { showToast("Rekod Berjaya Dikemaskini!"); closeAdminEdit(); fetchAdminData(); }
-            } catch (e) { showToast("Ralat Menyimpan", "error"); } 
-            finally { btn.disabled = false; btn.innerText = "Simpan"; }
+                if (result.status === 'success') {
+                    showToast("Rekod Berjaya Dikemaskini! ✅");
+                    closeAdminEdit();
+                    fetchAdminData();
+                } else {
+                    showToast("Ralat: " + (result.message || "Gagal simpan"), "error");
+                }
+            } catch (e) {
+                showToast("Ralat Menyimpan", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan";
+            }
         }
+
+        // ─── Keypad ────────────────────────────────────────────────
+        let currentPin = '';
+        function openKeypad() { currentPin = ''; updatePinDots(); document.getElementById('keypadModal').classList.remove('hidden'); }
+        function closeKeypad() { document.getElementById('keypadModal').classList.add('hidden'); }
+        function pressPin(n) {
+            if (currentPin.length < 4) { currentPin += n; updatePinDots(); }
+            if (currentPin.length === 4) setTimeout(verifyAdmin, 200);
+        }
+        function updatePinDots() {
+            const dots = document.getElementById('pinDots').children;
+            for (let i = 0; i < 4; i++) {
+                dots[i].className = i < currentPin.length
+                    ? 'w-4 h-4 rounded-full bg-blue-500'
+                    : 'w-4 h-4 rounded-full border-2 border-slate-600';
+            }
+        }
+        function verifyAdmin() {
+            if (currentPin === CONFIG.ADMIN_PIN) { closeKeypad(); fetchAdminData(); }
+            else { alert("PIN Salah!"); currentPin = ''; updatePinDots(); }
+        }
+        function clearPin() { currentPin = ''; updatePinDots(); }
+        function logout() { location.reload(); }
+
+        // [FIX] Setup event listeners selepas DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFileInput();
+        });
     </script>
+
+</body>
+</html>
