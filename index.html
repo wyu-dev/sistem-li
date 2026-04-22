@@ -498,6 +498,7 @@
     <div class="tabs">
         <button class="tab-btn active" id="btnTabPelajar" onclick="switchTab('tabPelajar')">Maklumat Pelajar</button>
         <button class="tab-btn" id="btnTabSyarikat" onclick="switchTab('tabSyarikat')" style="display:none">Maklumat LI</button>
+        <button class="tab-btn" id="btnTabBorang" onclick="switchTab('tabBorang')" style="display:none">Borang</button>
     </div>
 
     <!-- TAB: Maklumat Pelajar -->
@@ -572,6 +573,38 @@
             <div class="inp-group"><label class="inp-label">Tarikh Lapor Diri</label><input id="fLaporDiri" type="date" class="inp"></div>
             <div class="inp-group"><label class="inp-label">Tarikh Mula LI</label><input id="fMulaLI" type="date" class="inp"></div>
             <div class="inp-group" style="margin-bottom:0"><label class="inp-label">Tarikh Tamat LI</label><input id="fTamatLI" type="date" class="inp"></div>
+        </div>
+    </div>
+
+
+    <!-- TAB: Borang -->
+    <div id="tabBorang" style="display:none">
+        <div class="card">
+            <div class="card-title">Surat Setuju Terima</div>
+            <p style="font-size:13px;color:var(--gray-600);margin-bottom:14px">Muat naik surat setuju terima daripada syarikat / majikan tempat LI.</p>
+            <a id="suratSetujuLink" href="#" target="_blank" class="bukti-existing" style="display:none">📎 Lihat Surat Setuju Terima Yang Dihantar</a>
+            <div class="file-zone">
+                <input id="fSuratSetuju" type="file" accept="image/*,application/pdf">
+                <div class="file-zone-icon">📄</div>
+                <div class="file-zone-label">Pilih Fail atau Ambil Gambar</div>
+                <div class="file-zone-sub">Gambar (JPG/PNG) atau PDF • Maks 3MB</div>
+            </div>
+            <img id="suratSetujuPreview" class="preview-img" style="display:none" alt="Preview">
+            <div id="suratSetujuPdfPreview" style="display:none;margin-top:10px;background:var(--gray-100);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--gray-600)">📄 <span id="suratSetujuPdfName"></span></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Borang Lapor Diri LI</div>
+            <p style="font-size:13px;color:var(--gray-600);margin-bottom:14px">Muat naik borang lapor diri yang telah ditandatangani oleh penyelia syarikat.</p>
+            <a id="borangLaporLink" href="#" target="_blank" class="bukti-existing" style="display:none">📎 Lihat Borang Lapor Diri Yang Dihantar</a>
+            <div class="file-zone">
+                <input id="fBorangLapor" type="file" accept="image/*,application/pdf">
+                <div class="file-zone-icon">📋</div>
+                <div class="file-zone-label">Pilih Fail atau Ambil Gambar</div>
+                <div class="file-zone-sub">Gambar (JPG/PNG) atau PDF • Maks 3MB</div>
+            </div>
+            <img id="borangLaporPreview" class="preview-img" style="display:none" alt="Preview">
+            <div id="borangLaporPdfPreview" style="display:none;margin-top:10px;background:var(--gray-100);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--gray-600)">📄 <span id="borangLaporPdfName"></span></div>
         </div>
     </div>
 
@@ -674,7 +707,7 @@
 ================================================================ -->
 <script>
     const CONFIG = {
-        GAS_URL: "https://script.google.com/macros/s/AKfycby8rk17EBT-6UpLAtjjV6Py4YasZdF764GjM_ujjTUfS8ds8OHIinFQk5ljiMIwDIzVSw/exec",
+        GAS_URL: "https://script.google.com/macros/s/AKfycbxATFloyxoMMTi1DC5bF1F9njVFjo9uSUCeoz4nxbD9MkMP9rkHekrr6a_EykjgkX0mMQ/exec",
         ADMIN_PIN: "5547",
         TOKEN: "ADTEC2026"
     };
@@ -800,6 +833,16 @@
         const buktiEl = document.getElementById('buktiPreviewSediaAda');
         if (currentUser.buktiUrl) { buktiEl.href = currentUser.buktiUrl; buktiEl.style.display = 'flex'; }
         else { buktiEl.style.display = 'none'; }
+
+        // Borang links
+        const suratEl = document.getElementById('suratSetujuLink');
+        if (currentUser.suratSetujuUrl) { suratEl.href = currentUser.suratSetujuUrl; suratEl.style.display = 'flex'; }
+        else { suratEl.style.display = 'none'; }
+
+        const borangEl = document.getElementById('borangLaporLink');
+        if (currentUser.borangLaporUrl) { borangEl.href = currentUser.borangLaporUrl; borangEl.style.display = 'flex'; }
+        else { borangEl.style.display = 'none'; }
+
         handleStatusChange();
     }
 
@@ -813,12 +856,15 @@
     function handleStatusChange() {
         const s = document.getElementById('fStatus').value;
         const tabLI = document.getElementById('btnTabSyarikat');
+        const tabBorang = document.getElementById('btnTabBorang');
         document.getElementById('secBelajar').style.display = 'none';
         document.getElementById('secKerja').style.display = 'none';
         document.getElementById('secBukti').style.display = 'none';
         tabLI.style.display = 'none';
+        tabBorang.style.display = 'none';
         if (s === 'Latihan Industri') {
             tabLI.style.display = '';
+            tabBorang.style.display = '';
         } else if (s === 'Sambung Belajar') {
             document.getElementById('secBelajar').style.display = '';
             document.getElementById('secBukti').style.display = '';
@@ -831,36 +877,50 @@
     }
 
     function switchTab(id) {
-        const isP = id === 'tabPelajar';
-        document.getElementById('tabPelajar').style.display = isP ? '' : 'none';
-        document.getElementById('tabSyarikat').style.display = isP ? 'none' : '';
-        document.getElementById('btnTabPelajar').className = 'tab-btn' + (isP ? ' active' : '');
-        document.getElementById('btnTabSyarikat').className = 'tab-btn' + (!isP ? ' active' : '');
+        const tabs = ['tabPelajar', 'tabSyarikat', 'tabBorang'];
+        const btns = ['btnTabPelajar', 'btnTabSyarikat', 'btnTabBorang'];
+        tabs.forEach(t => document.getElementById(t).style.display = 'none');
+        btns.forEach(b => {
+            const el = document.getElementById(b);
+            if (el) el.className = 'tab-btn';
+        });
+        document.getElementById(id).style.display = '';
+        const btnId = 'btn' + id.charAt(0).toUpperCase() + id.slice(1);
+        const activeBtn = document.getElementById(btnId);
+        if (activeBtn) activeBtn.className = 'tab-btn active';
     }
 
     // ── File Input ────────────────────────────────────────────────────
     function setupFileInput() {
-        document.getElementById('fBukti').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            document.getElementById('buktiPreview').style.display = 'none';
-            document.getElementById('pdfPreview').style.display = 'none';
-            if (!file) return;
-            if (file.size > 3 * 1024 * 1024) {
-                showToast("Fail melebihi 3MB. Sila kecilkan.", "error");
-                e.target.value = ''; return;
-            }
-            if (file.type === 'application/pdf') {
-                document.getElementById('pdfFileName').textContent = file.name;
-                document.getElementById('pdfPreview').style.display = '';
-            } else {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    document.getElementById('buktiPreview').src = ev.target.result;
-                    document.getElementById('buktiPreview').style.display = '';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        // Helper untuk setup setiap file input
+        function setupOne(inputId, previewImgId, pdfPreviewId, pdfNameId) {
+            const el = document.getElementById(inputId);
+            if (!el) return;
+            el.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                document.getElementById(previewImgId).style.display = 'none';
+                document.getElementById(pdfPreviewId).style.display = 'none';
+                if (!file) return;
+                if (file.size > 3 * 1024 * 1024) {
+                    showToast("Fail melebihi 3MB. Sila kecilkan.", "error");
+                    e.target.value = ''; return;
+                }
+                if (file.type === 'application/pdf') {
+                    document.getElementById(pdfNameId).textContent = file.name;
+                    document.getElementById(pdfPreviewId).style.display = '';
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        document.getElementById(previewImgId).src = ev.target.result;
+                        document.getElementById(previewImgId).style.display = '';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        setupOne('fBukti', 'buktiPreview', 'pdfPreview', 'pdfFileName');
+        setupOne('fSuratSetuju', 'suratSetujuPreview', 'suratSetujuPdfPreview', 'suratSetujuPdfName');
+        setupOne('fBorangLapor', 'borangLaporPreview', 'borangLaporPdfPreview', 'borangLaporPdfName');
     }
 
     function fileToBase64(file) {
@@ -877,20 +937,36 @@
         const btn = document.getElementById('btnUpdate');
         btn.disabled = true;
         btn.innerHTML = '<div class="spinner" style="border-top-color:var(--yellow)"></div> Menghantar...';
-        const fileInput = document.getElementById('fBukti');
-        let fileBase64 = null, fileName = null;
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
+
+        // Helper: baca file jadi base64
+        async function readFile(inputId, prefix) {
+            const el = document.getElementById(inputId);
+            if (!el || el.files.length === 0) return { b64: null, name: null };
+            const file = el.files[0];
             try {
-                fileBase64 = await fileToBase64(file);
-                fileName = currentUser.ndp + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            } catch(e) {
-                showToast("Gagal baca fail.", "error");
-                btn.disabled = false;
-                btn.innerHTML = '<span class="accent">▶</span> SIMPAN / KEMASKINI MAKLUMAT';
-                return;
-            }
+                const b64 = await fileToBase64(file);
+                const name = prefix + '_' + currentUser.ndp + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                return { b64, name };
+            } catch(e) { return { b64: null, name: null }; }
         }
+
+        let bukti = { b64: null, name: null };
+        let suratSetuju = { b64: null, name: null };
+        let borangLapor = { b64: null, name: null };
+
+        try {
+            [bukti, suratSetuju, borangLapor] = await Promise.all([
+                readFile('fBukti', 'Bukti'),
+                readFile('fSuratSetuju', 'SuratSetuju'),
+                readFile('fBorangLapor', 'BorangLapor')
+            ]);
+        } catch(e) {
+            showToast("Gagal baca fail.", "error");
+            btn.disabled = false;
+            btn.innerHTML = '<span class="accent">▶</span> SIMPAN / KEMASKINI MAKLUMAT';
+            return;
+        }
+
         const payload = {
             action: 'updatePelajar', token: CONFIG.TOKEN,
             rowIdx: currentUser.rowIdx, ndp: currentUser.ndp,
@@ -910,8 +986,14 @@
             namaKerja: document.getElementById('fNamaKerja').value,
             alamatKerja: document.getElementById('fAlamatKerja').value,
             gajiKerja: document.getElementById('fGajiKerja').value,
-            fileBase64: fileBase64, fileName: fileName,
-            buktiSediaAda: currentUser.buktiUrl || ''
+            // Fail bukti asal (untuk semua status)
+            fileBase64: bukti.b64, fileName: bukti.name,
+            buktiSediaAda: currentUser.buktiUrl || '',
+            // Fail borang (untuk LI sahaja)
+            suratSetujuBase64: suratSetuju.b64, suratSetujuFileName: suratSetuju.name,
+            suratSetujuSediaAda: currentUser.suratSetujuUrl || '',
+            borangLaporBase64: borangLapor.b64, borangLaporFileName: borangLapor.name,
+            borangLaporSediaAda: currentUser.borangLaporUrl || ''
         };
         try {
             const res = await fetch(CONFIG.GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -919,6 +1001,8 @@
             if (result.status === 'success') {
                 showToast("✅ Maklumat berjaya disimpan!");
                 if (result.newBuktiUrl) currentUser.buktiUrl = result.newBuktiUrl;
+                if (result.newSuratSetujuUrl) currentUser.suratSetujuUrl = result.newSuratSetujuUrl;
+                if (result.newBorangLaporUrl) currentUser.borangLaporUrl = result.newBorangLaporUrl;
                 Object.assign(currentUser, {
                     status: payload.status, alamat: payload.alamat, telefon: payload.telefon,
                     alamatSyarikat: payload.alamatSyarikat, penyelia: payload.penyelia,
