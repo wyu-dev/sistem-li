@@ -178,21 +178,18 @@
 
         /* Responsive breakpoint */
         @media (max-width: 720px) {
-            #loginScreen {
-                background: transparent;
-                display: block !important; /* override flex supaya mobile div ambil lebar penuh */
-                min-height: 100vh;
-            }
-            .login-left, .login-right { display: none !important; }
-            .login-mobile {
+            /* Desktop login panel — sembunyikan di mobile */
+            #loginScreen { display: none !important; }
+            /* Mobile login — tunjuk penuh */
+            #loginMobile {
                 display: flex !important;
-                width: 100% !important;
+                width: 100%;
                 min-height: 100vh;
-                position: relative;
             }
         }
         @media (min-width: 721px) {
-            .login-mobile { display: none !important; }
+            /* Mobile login — sembunyikan di desktop */
+            #loginMobile { display: none !important; }
         }
 
         /* ── Main Layout ── */
@@ -404,8 +401,10 @@
         </div>
     </div>
 
+</div><!-- end loginScreen -->
+
     <!-- ── MOBILE: Full-screen wave layout ── -->
-    <div class="login-mobile">
+    <div class="login-mobile" id="loginMobile">
         <div class="lm-top">
             <div class="lm-logo">
                 <img src="https://i.postimg.cc/RVvGnTkW/Logo_ADTEC_JTM_2025_small.png" alt="ADTEC"
@@ -475,7 +474,6 @@
         </div>
     </div>
 
-</div><!-- end loginScreen -->
 
 
 <!-- ================================================================
@@ -1186,10 +1184,11 @@
         const dots = document.getElementById('pinDots').children;
         for (let i = 0; i < 4; i++) dots[i].className = 'pin-dot' + (i < currentPin.length ? ' filled' : '');
     }
-    // Sembunyikan semua elemen login (desktop + mobile)
+    // Sembunyikan semua elemen login — desktop & mobile berasingan
     function hideAllLogin() {
-        document.getElementById('loginScreen').style.display = 'none';
-        const mob = document.querySelector('.login-mobile');
+        const ls = document.getElementById('loginScreen');
+        if (ls) ls.style.display = 'none';
+        const mob = document.getElementById('loginMobile');
         if (mob) mob.style.display = 'none';
     }
 
