@@ -707,7 +707,7 @@
 ================================================================ -->
 <script>
     const CONFIG = {
-        GAS_URL: "https://script.google.com/macros/s/AKfycbxATFloyxoMMTi1DC5bF1F9njVFjo9uSUCeoz4nxbD9MkMP9rkHekrr6a_EykjgkX0mMQ/exec",
+        GAS_URL: "https://script.google.com/macros/s/AKfycby8rk17EBT-6UpLAtjjV6Py4YasZdF764GjM_ujjTUfS8ds8OHIinFQk5ljiMIwDIzVSw/exec",
         ADMIN_PIN: "5547",
         TOKEN: "ADTEC2026"
     };
@@ -793,7 +793,7 @@
 
     // ── Show Dashboards ───────────────────────────────────────────────
     function showStudentDashboard() {
-        document.getElementById('loginScreen').style.display = 'none';
+        hideAllLogin();
         document.getElementById('studentDashboard').style.display = '';
         document.getElementById('mainTopbar').style.display = '';
         document.getElementById('topbarUser').textContent = currentUser.nama;
@@ -801,7 +801,7 @@
     }
 
     function showAdminDashboard() {
-        document.getElementById('loginScreen').style.display = 'none';
+        hideAllLogin();
         document.getElementById('adminDashboard').style.display = '';
         document.getElementById('mainTopbar').style.display = '';
         document.getElementById('topbarUser').textContent = 'Admin';
@@ -1186,9 +1186,16 @@
         const dots = document.getElementById('pinDots').children;
         for (let i = 0; i < 4; i++) dots[i].className = 'pin-dot' + (i < currentPin.length ? ' filled' : '');
     }
+    // Sembunyikan semua elemen login (desktop + mobile)
+    function hideAllLogin() {
+        document.getElementById('loginScreen').style.display = 'none';
+        const mob = document.querySelector('.login-mobile');
+        if (mob) mob.style.display = 'none';
+    }
+
     function verifyAdmin() {
         if (currentPin === CONFIG.ADMIN_PIN) {
-            document.getElementById('loginScreen').style.display = 'none'; // sembunyikan terus
+            hideAllLogin();
             fetchAdminData();
         } else {
             document.getElementById('pinError').textContent = 'PIN salah. Cuba lagi.';
@@ -1209,7 +1216,7 @@
     }
     function verifyAdmin_m() {
         if (currentPin_m === CONFIG.ADMIN_PIN) {
-            document.getElementById('loginScreen').style.display = 'none'; // sembunyikan terus
+            hideAllLogin();
             fetchAdminData();
         } else {
             document.getElementById('pinError_m').textContent = 'PIN salah. Cuba lagi.';
