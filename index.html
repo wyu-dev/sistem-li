@@ -1187,9 +1187,9 @@
     // Sembunyikan semua elemen login — desktop & mobile berasingan
     function hideAllLogin() {
         const ls = document.getElementById('loginScreen');
-        if (ls) ls.style.display = 'none';
+        if (ls) ls.style.setProperty('display', 'none', 'important');
         const mob = document.getElementById('loginMobile');
-        if (mob) mob.style.display = 'none';
+        if (mob) mob.style.setProperty('display', 'none', 'important');
     }
 
     function verifyAdmin() {
