@@ -1103,8 +1103,13 @@
         for (let i = 0; i < 4; i++) dots[i].className = 'pin-dot' + (i < currentPin.length ? ' filled' : '');
     }
     function verifyAdmin() {
-        if (currentPin === CONFIG.ADMIN_PIN) { fetchAdminData(); }
-        else { document.getElementById('pinError').textContent = 'PIN salah. Cuba lagi.'; currentPin = ''; updatePinDots(); }
+        if (currentPin === CONFIG.ADMIN_PIN) {
+            document.getElementById('loginScreen').style.display = 'none'; // sembunyikan terus
+            fetchAdminData();
+        } else {
+            document.getElementById('pinError').textContent = 'PIN salah. Cuba lagi.';
+            currentPin = ''; updatePinDots();
+        }
     }
 
     // ── PIN Keypad Mobile ────────────────────────────────────────────
@@ -1119,8 +1124,13 @@
         for (let i = 0; i < 4; i++) dots[i].className = 'pin-dot' + (i < currentPin_m.length ? ' filled' : '');
     }
     function verifyAdmin_m() {
-        if (currentPin_m === CONFIG.ADMIN_PIN) { fetchAdminData(); }
-        else { document.getElementById('pinError_m').textContent = 'PIN salah. Cuba lagi.'; currentPin_m = ''; updatePinDots_m(); }
+        if (currentPin_m === CONFIG.ADMIN_PIN) {
+            document.getElementById('loginScreen').style.display = 'none'; // sembunyikan terus
+            fetchAdminData();
+        } else {
+            document.getElementById('pinError_m').textContent = 'PIN salah. Cuba lagi.';
+            currentPin_m = ''; updatePinDots_m();
+        }
     }
 
     function logout() { currentUser = null; globalAdminData = []; location.reload(); }
