@@ -655,6 +655,14 @@
      ADMIN DASHBOARD
 ================================================================ -->
 <div id="adminDashboard" style="display:none">
+    <!-- Admin Tabs -->
+    <div class="tabs" style="margin-bottom:16px">
+        <button class="tab-btn active" id="aTabSenarai" onclick="switchAdminTab('senarai')">Senarai Pelajar</button>
+        <button class="tab-btn" id="aTabKehadiran" onclick="switchAdminTab('kehadiran')">Analisa Kehadiran</button>
+    </div>
+
+    <!-- Tab: Senarai (default sedia ada) -->
+    <div id="aSecSenarai">
     <div class="stat-grid">
         <div class="stat-card"><div class="stat-num" id="statTotal" style="color:var(--blue)">—</div><div class="stat-label">Jumlah Pelajar</div></div>
         <div class="stat-card"><div class="stat-num" id="statComplete" style="color:var(--green)">—</div><div class="stat-label">Data Lengkap</div></div>
@@ -687,6 +695,144 @@
                 <tbody id="adminTableBody"></tbody>
             </table>
         </div>
+    </div>
+    </div><!-- end aSecSenarai -->
+
+    <!-- Tab: Analisa Kehadiran -->
+    <div id="aSecKehadiran" style="display:none">
+        <div class="filter-bar">
+            <select id="aKhSesi" onchange="loadAdminKehadiran()"><option value="">Semua Sesi</option></select>
+            <select id="aKhKursus" onchange="loadAdminKehadiran()"><option value="">Semua Kursus</option></select>
+            <input type="date" id="aKhDariTarikh" onchange="loadAdminKehadiran()" style="max-width:160px" placeholder="Dari">
+            <input type="date" id="aKhHinggaTarikh" onchange="loadAdminKehadiran()" style="max-width:160px" placeholder="Hingga">
+            <span class="filter-count" id="aKhCount"></span>
+            <button class="btn-reset" onclick="resetKehadiranFilter()">Reset</button>
+            <button class="btn-edit" onclick="cetakKehadiran()" style="background:var(--blue)">CETAK PDF</button>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card"><div class="stat-num" id="aKhStatPelajar" style="color:var(--blue)">—</div><div class="stat-label">Pelajar Aktif</div></div>
+            <div class="stat-card"><div class="stat-num" id="aKhStatHadir" style="color:var(--green)">—</div><div class="stat-label">Jumlah Hadir</div></div>
+            <div class="stat-card"><div class="stat-num" id="aKhStatTH" style="color:var(--red)">—</div><div class="stat-label">Tidak Hadir</div></div>
+        </div>
+
+        <div class="table-wrap">
+            <div style="overflow-x:auto">
+                <table>
+                    <thead><tr>
+                        <th>#</th><th>Nama</th><th>NDP</th><th>Kursus</th><th style="text-align:center">Hadir</th><th style="text-align:center">Tidak Hadir</th><th style="text-align:center">% Kehadiran</th><th style="text-align:center">Tindakan</th>
+                    </tr></thead>
+                    <tbody id="aKhTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ── Modal Detail Kehadiran ── -->
+<div id="aKhDetailModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:600px">
+        <div class="modal-header">
+            <div><h3 id="aKhDetailNama">—</h3><p id="aKhDetailNDP">—</p></div>
+            <button class="modal-close" onclick="closeKhDetail()">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="aKhDetailList" style="max-height:60vh;overflow-y:auto;font-size:13px"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="closeKhDetail()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     PRINT PREVIEW (A4) — Laporan Kehadiran
+================================================================ -->
+<div id="printArea" style="display:none">
+    <style>
+        @media print {
+            @page { size: A4 portrait; margin: 12mm; }
+            body * { visibility: hidden !important; }
+            #printArea, #printArea * { visibility: visible !important; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+        }
+        #printArea {
+            font-family: 'Barlow', sans-serif;
+            color: #000;
+            background: #fff;
+            padding: 20px;
+        }
+        #printArea .ph-head { display: flex; align-items: center; gap: 16px; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 16px; }
+        #printArea .ph-head img { height: 60px; width: auto; }
+        #printArea .ph-title { font-family: 'Barlow Condensed', sans-serif; }
+        #printArea .ph-title h1 { font-size: 18px; font-weight: 800; letter-spacing: 0.5px; line-height: 1.2; text-transform: uppercase; }
+        #printArea .ph-title p { font-size: 11px; color: #555; margin-top: 2px; }
+        #printArea .ph-meta { background: #f5f5f5; border-left: 4px solid #0047AB; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; line-height: 1.6; }
+        #printArea .ph-meta strong { font-weight: 700; }
+        #printArea h2 { font-size: 14px; font-weight: 800; margin: 14px 0 6px; font-family: 'Barlow Condensed', sans-serif; }
+        #printArea table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        #printArea table th, #printArea table td { border: 1px solid #000; padding: 5px 6px; text-align: left; vertical-align: top; }
+        #printArea table th { background: #0047AB; color: #fff; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+        #printArea table td.center { text-align: center; }
+        #printArea .ph-foot { margin-top: 24px; font-size: 10px; color: #666; border-top: 1px solid #ccc; padding-top: 10px; display: flex; justify-content: space-between; }
+        #printArea .ph-sign { margin-top: 36px; display: flex; justify-content: space-between; gap: 40px; }
+        #printArea .ph-sign-block { flex: 1; }
+        #printArea .ph-sign-line { border-bottom: 1px solid #000; height: 50px; margin-bottom: 4px; }
+        #printArea .ph-sign-block p { font-size: 11px; }
+    </style>
+
+    <div class="ph-head">
+        <img src="https://wyu-dev.github.io/logo/logo-adtec.png" alt="ADTEC Logo">
+        <div class="ph-title">
+            <h1>Laporan Analisa Kehadiran<br>Latihan Industri (LI)</h1>
+            <p>ADTEC JTM Kampus Kuantan • Unit Khidmat Sokongan Komuniti dan Pekerjaan (CESS)</p>
+        </div>
+    </div>
+
+    <div class="ph-meta" id="phMeta"></div>
+
+    <h2>Ringkasan Statistik</h2>
+    <table style="margin-bottom:14px">
+        <thead><tr>
+            <th style="width:40%">Perkara</th><th style="width:60%" class="center">Jumlah</th>
+        </tr></thead>
+        <tbody id="phStatBody"></tbody>
+    </table>
+
+    <h2>Senarai Kehadiran Pelajar</h2>
+    <table>
+        <thead><tr>
+            <th style="width:5%">#</th>
+            <th style="width:30%">Nama</th>
+            <th style="width:13%">NDP</th>
+            <th style="width:24%">Kursus</th>
+            <th style="width:10%" class="center">Hadir</th>
+            <th style="width:10%" class="center">T. Hadir</th>
+            <th style="width:8%" class="center">%</th>
+        </tr></thead>
+        <tbody id="phTableBody"></tbody>
+    </table>
+
+    <div class="ph-sign">
+        <div class="ph-sign-block">
+            <div class="ph-sign-line"></div>
+            <p><strong>Disediakan oleh:</strong></p>
+            <p>(______________________)</p>
+            <p>Pegawai CESS</p>
+        </div>
+        <div class="ph-sign-block">
+            <div class="ph-sign-line"></div>
+            <p><strong>Disahkan oleh:</strong></p>
+            <p>(______________________)</p>
+            <p>Pengarah ADTEC Kuantan</p>
+        </div>
+    </div>
+
+    <div class="ph-foot">
+        <span>Cetakan: <span id="phPrintDate"></span></span>
+        <span>Sistem Pengurusan LI — ADTEC JTM Kampus Kuantan</span>
     </div>
 </div>
 
@@ -744,7 +890,7 @@
 ================================================================ -->
 <script>
     const CONFIG = {
-        GAS_URL: "https://script.google.com/macros/s/AKfycbyz0X6wKAnLP6mUV8kl678a46dVePlr73pVQRDaiuVzMTGWh8tz3DeuTJt4-gkkt8dvkg/exec",
+        GAS_URL: "https://script.google.com/macros/s/AKfycbw-44zs4Tfn6c2poLbEe4QRi9jlNtsuvG5pk6BO0j73_nGfoFEaRMGNpSuJivfDxRU5Rg/exec",
         ADMIN_PIN: "5547",
         TOKEN: "ADTEC2026"
     };
@@ -929,6 +1075,11 @@
         const btnId = 'btn' + id.charAt(0).toUpperCase() + id.slice(1);
         const activeBtn = document.getElementById(btnId);
         if (activeBtn) activeBtn.className = 'tab-btn active';
+
+        // [FIX] Sembunyikan butang utama "SIMPAN/KEMASKINI MAKLUMAT" bila dalam tab Kehadiran
+        // (Kehadiran ada butang simpan tersendiri)
+        const mainSaveBtn = document.getElementById('btnUpdate');
+        if (mainSaveBtn) mainSaveBtn.style.display = (id === 'tabKehadiran') ? 'none' : '';
 
         if (id === 'tabKehadiran') loadKehadiran();
     }
@@ -1317,6 +1468,19 @@
 
     function renderKehadiran() {
         const today = todayString();
+
+        // [FIX] Normalize tarikh ke yyyy-MM-dd jika dapat format lain dari GAS
+        kehadiranHistory.forEach(k => {
+            if (k.tarikh && !/^\d{4}-\d{2}-\d{2}$/.test(k.tarikh)) {
+                try {
+                    const d = new Date(k.tarikh);
+                    if (!isNaN(d.getTime())) {
+                        k.tarikh = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    }
+                } catch(e) {}
+            }
+        });
+
         const todayRecord = kehadiranHistory.find(k => k.tarikh === today);
         if (todayRecord) {
             document.getElementById('kehadiranSudahTanda').style.display = '';
@@ -1380,6 +1544,223 @@
             btn.disabled = false;
             btn.innerHTML = '<span class="accent">▶</span> SIMPAN KEHADIRAN';
         }
+    }
+
+
+    // ── Admin: Switch Tab ─────────────────────────────────────────────
+    function switchAdminTab(tab) {
+        const isSenarai = tab === 'senarai';
+        document.getElementById('aSecSenarai').style.display = isSenarai ? '' : 'none';
+        document.getElementById('aSecKehadiran').style.display = isSenarai ? 'none' : '';
+        document.getElementById('aTabSenarai').className = 'tab-btn' + (isSenarai ? ' active' : '');
+        document.getElementById('aTabKehadiran').className = 'tab-btn' + (!isSenarai ? ' active' : '');
+        if (!isSenarai) loadAdminKehadiran();
+    }
+
+    // ── Admin: Load Kehadiran All ────────────────────────────────────
+    let allKehadiranData = [];
+    let lastKhSummary = []; // untuk print
+
+    async function loadAdminKehadiran() {
+        // Populate filter dropdowns
+        const sesiSet = [...new Set(globalAdminData.map(p => p.sesi).filter(Boolean))].sort();
+        const kursusSet = [...new Set(globalAdminData
+            .filter(p => p.status === 'Latihan Industri')
+            .map(p => p.kursus).filter(Boolean))].sort();
+        const fSesi = document.getElementById('aKhSesi');
+        const fKursus = document.getElementById('aKhKursus');
+        if (fSesi.children.length <= 1) {
+            fSesi.innerHTML = '<option value="">Semua Sesi</option>' + sesiSet.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+        if (fKursus.children.length <= 1) {
+            fKursus.innerHTML = '<option value="">Semua Kursus</option>' + kursusSet.map(k => `<option value="${k}">${k}</option>`).join('');
+        }
+
+        const tbody = document.getElementById('aKhTableBody');
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px"><div class="spinner" style="margin:0 auto 8px"></div>Memuatkan data kehadiran...</td></tr>';
+
+        // Fetch all kehadiran from GAS
+        try {
+            const res = await fetch(`${CONFIG.GAS_URL}?action=getAllKehadiran&token=${CONFIG.TOKEN}`);
+            const result = await res.json();
+            if (result.status !== 'success') {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">Gagal: ${result.message || 'Ralat'}</td></tr>`;
+                return;
+            }
+            allKehadiranData = result.data || [];
+            renderAdminKehadiran();
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">Ralat sambungan</td></tr>';
+        }
+    }
+
+    function renderAdminKehadiran() {
+        const sesi = document.getElementById('aKhSesi').value;
+        const kursus = document.getElementById('aKhKursus').value;
+        const dari = document.getElementById('aKhDariTarikh').value;
+        const hingga = document.getElementById('aKhHinggaTarikh').value;
+
+        // Pelajar yang status = Latihan Industri sahaja
+        let pelajarLI = globalAdminData.filter(p => p.status === 'Latihan Industri');
+        if (sesi) pelajarLI = pelajarLI.filter(p => p.sesi === sesi);
+        if (kursus) pelajarLI = pelajarLI.filter(p => p.kursus === kursus);
+
+        // Filter kehadiran by date range
+        let kehadiranFiltered = allKehadiranData.slice();
+        if (dari) kehadiranFiltered = kehadiranFiltered.filter(k => k.tarikh >= dari);
+        if (hingga) kehadiranFiltered = kehadiranFiltered.filter(k => k.tarikh <= hingga);
+
+        // Build summary per pelajar
+        const summary = pelajarLI.map(p => {
+            const recs = kehadiranFiltered.filter(k => k.ndp === p.ndp);
+            const hadir = recs.filter(k => k.status === 'Hadir').length;
+            const tidak = recs.filter(k => k.status === 'Tidak Hadir').length;
+            const total = hadir + tidak;
+            const peratus = total > 0 ? ((hadir / total) * 100).toFixed(1) : '0.0';
+            return {
+                ndp: p.ndp, nama: p.nama, kursus: p.kursus, sesi: p.sesi,
+                hadir, tidak, total, peratus
+            };
+        });
+
+        lastKhSummary = summary;
+
+        // Stats
+        const totalHadir = summary.reduce((a, b) => a + b.hadir, 0);
+        const totalTidak = summary.reduce((a, b) => a + b.tidak, 0);
+        document.getElementById('aKhStatPelajar').textContent = pelajarLI.length;
+        document.getElementById('aKhStatHadir').textContent = totalHadir;
+        document.getElementById('aKhStatTH').textContent = totalTidak;
+        document.getElementById('aKhCount').textContent = `${pelajarLI.length} pelajar LI`;
+
+        const tbody = document.getElementById('aKhTableBody');
+        if (summary.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray-400)">Tiada pelajar LI ditemui</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = summary.map((s, i) => {
+            const pColor = s.peratus >= 80 ? 'var(--green)' : (s.peratus >= 60 ? '#d97706' : 'var(--red)');
+            return `<tr>
+                <td>${i+1}</td>
+                <td style="font-weight:600">${s.nama}</td>
+                <td>${s.ndp}</td>
+                <td style="font-size:11px;color:var(--gray-600);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${s.kursus||''}">${s.kursus||'—'}</td>
+                <td class="center" style="color:var(--green);font-weight:700">${s.hadir}</td>
+                <td class="center" style="color:var(--red);font-weight:700">${s.tidak}</td>
+                <td class="center" style="font-weight:700;color:${pColor}">${s.peratus}%</td>
+                <td style="text-align:center"><button class="btn-edit" onclick="openKhDetail('${s.ndp}')">Detail</button></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // Re-render when filter change
+    function loadAdminKehadiran_filtered() { renderAdminKehadiran(); }
+
+    function resetKehadiranFilter() {
+        document.getElementById('aKhSesi').value = '';
+        document.getElementById('aKhKursus').value = '';
+        document.getElementById('aKhDariTarikh').value = '';
+        document.getElementById('aKhHinggaTarikh').value = '';
+        renderAdminKehadiran();
+    }
+
+    function openKhDetail(ndp) {
+        const pelajar = globalAdminData.find(p => p.ndp === ndp);
+        if (!pelajar) return;
+        const recs = allKehadiranData
+            .filter(k => k.ndp === ndp)
+            .sort((a, b) => b.tarikh.localeCompare(a.tarikh));
+
+        document.getElementById('aKhDetailNama').textContent = pelajar.nama;
+        document.getElementById('aKhDetailNDP').textContent = `NDP: ${pelajar.ndp} | ${pelajar.kursus}`;
+
+        const formatDate = (iso) => {
+            const days = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+            const months = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+            const d = new Date(iso + 'T00:00:00');
+            return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        };
+
+        const list = document.getElementById('aKhDetailList');
+        if (recs.length === 0) {
+            list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400)">Tiada rekod kehadiran</div>';
+        } else {
+            list.innerHTML = recs.map(k => {
+                const isHadir = k.status === 'Hadir';
+                return `<div style="display:flex;gap:12px;padding:10px;border-bottom:1px solid var(--gray-100)">
+                    <div style="flex-shrink:0;width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;background:${isHadir?'#dcfce7':'#fee2e2'};color:${isHadir?'#166534':'#991b1b'}">${isHadir?'✓':'✗'}</div>
+                    <div style="flex:1">
+                        <div style="font-weight:700;font-size:12px">${formatDate(k.tarikh)}</div>
+                        <div style="font-size:11px;color:${isHadir?'var(--green)':'var(--red)'};font-weight:600">${k.status}</div>
+                        <div style="font-size:11px;color:var(--gray-600);margin-top:3px;line-height:1.5">${k.catatan||'<em style=color:#999>Tiada catatan</em>'}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        document.getElementById('aKhDetailModal').style.display = 'flex';
+    }
+    function closeKhDetail() { document.getElementById('aKhDetailModal').style.display = 'none'; }
+
+    // ── Cetak Laporan Kehadiran (A4 PDF) ─────────────────────────────
+    function cetakKehadiran() {
+        if (!lastKhSummary || lastKhSummary.length === 0) {
+            showToast("Tiada data untuk dicetak", "error");
+            return;
+        }
+        const sesi = document.getElementById('aKhSesi').value || 'Semua Sesi';
+        const kursus = document.getElementById('aKhKursus').value || 'Semua Kursus';
+        const dari = document.getElementById('aKhDariTarikh').value;
+        const hingga = document.getElementById('aKhHinggaTarikh').value;
+
+        const tarikhStr = (dari || hingga)
+            ? `${dari || 'Awal'} hingga ${hingga || 'Hari ini'}`
+            : 'Sepanjang tempoh LI';
+
+        const now = new Date();
+        const printDate = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+        // Meta
+        document.getElementById('phMeta').innerHTML = `
+            <strong>Sesi:</strong> ${sesi}<br>
+            <strong>Kursus:</strong> ${kursus}<br>
+            <strong>Tempoh:</strong> ${tarikhStr}<br>
+            <strong>Jumlah Pelajar:</strong> ${lastKhSummary.length} orang
+        `;
+
+        // Stats
+        const totalHadir = lastKhSummary.reduce((a, b) => a + b.hadir, 0);
+        const totalTidak = lastKhSummary.reduce((a, b) => a + b.tidak, 0);
+        const totalRekod = totalHadir + totalTidak;
+        const peratusKeseluruhan = totalRekod > 0 ? ((totalHadir / totalRekod) * 100).toFixed(1) : '0.0';
+        document.getElementById('phStatBody').innerHTML = `
+            <tr><td>Jumlah Pelajar Latihan Industri</td><td class="center">${lastKhSummary.length} orang</td></tr>
+            <tr><td>Jumlah Hari Hadir</td><td class="center">${totalHadir} hari</td></tr>
+            <tr><td>Jumlah Hari Tidak Hadir</td><td class="center">${totalTidak} hari</td></tr>
+            <tr><td>Jumlah Rekod Kehadiran</td><td class="center">${totalRekod} rekod</td></tr>
+            <tr><td><strong>Peratusan Kehadiran Keseluruhan</strong></td><td class="center"><strong>${peratusKeseluruhan}%</strong></td></tr>
+        `;
+
+        // Table
+        document.getElementById('phTableBody').innerHTML = lastKhSummary.map((s, i) => `
+            <tr>
+                <td class="center">${i+1}</td>
+                <td>${s.nama}</td>
+                <td>${s.ndp}</td>
+                <td>${s.kursus || '—'}</td>
+                <td class="center">${s.hadir}</td>
+                <td class="center">${s.tidak}</td>
+                <td class="center"><strong>${s.peratus}%</strong></td>
+            </tr>
+        `).join('');
+
+        document.getElementById('phPrintDate').textContent = printDate;
+
+        // Trigger print
+        document.getElementById('printArea').style.display = 'block';
+        window.print();
+        // Hide selepas print
+        setTimeout(() => { document.getElementById('printArea').style.display = 'none'; }, 500);
     }
 
     function logout() { currentUser = null; globalAdminData = []; location.reload(); }
