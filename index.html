@@ -497,6 +497,7 @@
         <button class="tab-btn active" id="btnTabPelajar" onclick="switchTab('tabPelajar')">Maklumat Pelajar</button>
         <button class="tab-btn" id="btnTabSyarikat" onclick="switchTab('tabSyarikat')" style="display:none">Maklumat LI</button>
         <button class="tab-btn" id="btnTabBorang" onclick="switchTab('tabBorang')" style="display:none">Borang</button>
+        <button class="tab-btn" id="btnTabKehadiran" onclick="switchTab('tabKehadiran')" style="display:none">Kehadiran</button>
     </div>
 
     <!-- TAB: Maklumat Pelajar -->
@@ -606,6 +607,44 @@
         </div>
     </div>
 
+
+    <!-- TAB: Kehadiran -->
+    <div id="tabKehadiran" style="display:none">
+        <div class="card">
+            <div class="card-title">Tandakan Kehadiran Hari Ini</div>
+            <p id="kehadiranTarikh" style="font-size:14px;color:var(--gray-600);margin-bottom:14px;font-weight:600"></p>
+
+            <div id="kehadiranSudahTanda" style="display:none;background:#dcfce7;border:1.5px solid #86efac;border-radius:8px;padding:14px;margin-bottom:14px">
+                <div style="font-size:13px;color:#166534;font-weight:700;margin-bottom:4px">SUDAH DITANDAKAN UNTUK HARI INI</div>
+                <div style="font-size:12px;color:#166534" id="kehadiranSudahDetail"></div>
+            </div>
+
+            <div id="kehadiranBelumTanda">
+                <label class="inp-label" style="margin-top:6px">Status Kehadiran</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+                    <button type="button" id="btnHadir" onclick="setKehadiranStatus('Hadir')" style="padding:14px;background:var(--gray-100);border:2px solid var(--gray-200);border-radius:8px;font-size:14px;font-weight:700;font-family:Barlow,sans-serif;cursor:pointer;transition:all 0.15s">HADIR</button>
+                    <button type="button" id="btnTidakHadir" onclick="setKehadiranStatus('Tidak Hadir')" style="padding:14px;background:var(--gray-100);border:2px solid var(--gray-200);border-radius:8px;font-size:14px;font-weight:700;font-family:Barlow,sans-serif;cursor:pointer;transition:all 0.15s">TIDAK HADIR</button>
+                </div>
+
+                <div class="inp-group">
+                    <label class="inp-label">Catatan Harian <span style="color:var(--red);text-transform:none;letter-spacing:0">(wajib)</span></label>
+                    <textarea id="fCatatan" class="inp" rows="4" placeholder="Tulis catatan kerja hari ini, atau sebab tidak hadir..."></textarea>
+                </div>
+
+                <button type="button" id="btnSimpanKehadiran" onclick="simpanKehadiran()" class="btn-save" style="margin-top:8px">
+                    <span class="accent">&#9654;</span> SIMPAN KEHADIRAN
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Sejarah Kehadiran</div>
+            <div id="kehadiranHistoryList" style="font-size:13px;color:var(--gray-600)">
+                <div style="text-align:center;padding:20px;color:var(--gray-400)">Memuatkan...</div>
+            </div>
+        </div>
+    </div>
+
     <button id="btnUpdate" class="btn-save" onclick="handleUpdate()">
         <span class="accent">▶</span> SIMPAN / KEMASKINI MAKLUMAT
     </button>
@@ -705,7 +744,7 @@
 ================================================================ -->
 <script>
     const CONFIG = {
-        GAS_URL: "https://script.google.com/macros/s/AKfycby8rk17EBT-6UpLAtjjV6Py4YasZdF764GjM_ujjTUfS8ds8OHIinFQk5ljiMIwDIzVSw/exec",
+        GAS_URL: "https://script.google.com/macros/s/AKfycbyz0X6wKAnLP6mUV8kl678a46dVePlr73pVQRDaiuVzMTGWh8tz3DeuTJt4-gkkt8dvkg/exec",
         ADMIN_PIN: "5547",
         TOKEN: "ADTEC2026"
     };
@@ -860,9 +899,12 @@
         document.getElementById('secBukti').style.display = 'none';
         tabLI.style.display = 'none';
         tabBorang.style.display = 'none';
+        const tabKehadiran = document.getElementById('btnTabKehadiran');
+        tabKehadiran.style.display = 'none';
         if (s === 'Latihan Industri') {
             tabLI.style.display = '';
             tabBorang.style.display = '';
+            tabKehadiran.style.display = '';
         } else if (s === 'Sambung Belajar') {
             document.getElementById('secBelajar').style.display = '';
             document.getElementById('secBukti').style.display = '';
@@ -875,17 +917,20 @@
     }
 
     function switchTab(id) {
-        const tabs = ['tabPelajar', 'tabSyarikat', 'tabBorang'];
-        const btns = ['btnTabPelajar', 'btnTabSyarikat', 'btnTabBorang'];
-        tabs.forEach(t => document.getElementById(t).style.display = 'none');
+        const tabs = ['tabPelajar', 'tabSyarikat', 'tabBorang', 'tabKehadiran'];
+        const btns = ['btnTabPelajar', 'btnTabSyarikat', 'btnTabBorang', 'btnTabKehadiran'];
+        tabs.forEach(t => { const el = document.getElementById(t); if (el) el.style.display = 'none'; });
         btns.forEach(b => {
             const el = document.getElementById(b);
             if (el) el.className = 'tab-btn';
         });
-        document.getElementById(id).style.display = '';
+        const tab = document.getElementById(id);
+        if (tab) tab.style.display = '';
         const btnId = 'btn' + id.charAt(0).toUpperCase() + id.slice(1);
         const activeBtn = document.getElementById(btnId);
         if (activeBtn) activeBtn.className = 'tab-btn active';
+
+        if (id === 'tabKehadiran') loadKehadiran();
     }
 
     // ── File Input ────────────────────────────────────────────────────
@@ -1220,6 +1265,120 @@
         } else {
             document.getElementById('pinError_m').textContent = 'PIN salah. Cuba lagi.';
             currentPin_m = ''; updatePinDots_m();
+        }
+    }
+
+
+    // ── Kehadiran ─────────────────────────────────────────────────────
+    let selectedKehadiranStatus = '';
+    let kehadiranHistory = [];
+
+    function todayString() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function formatTarikh(iso) {
+        const days = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+        const months = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+        const d = new Date(iso + 'T00:00:00');
+        return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function setKehadiranStatus(status) {
+        selectedKehadiranStatus = status;
+        const btnH = document.getElementById('btnHadir');
+        const btnT = document.getElementById('btnTidakHadir');
+        btnH.style.background = 'var(--gray-100)'; btnH.style.borderColor = 'var(--gray-200)'; btnH.style.color = 'var(--black)';
+        btnT.style.background = 'var(--gray-100)'; btnT.style.borderColor = 'var(--gray-200)'; btnT.style.color = 'var(--black)';
+        if (status === 'Hadir') {
+            btnH.style.background = '#dcfce7'; btnH.style.borderColor = 'var(--green)'; btnH.style.color = '#166534';
+        } else {
+            btnT.style.background = '#fee2e2'; btnT.style.borderColor = 'var(--red)'; btnT.style.color = '#991b1b';
+        }
+    }
+
+    async function loadKehadiran() {
+        document.getElementById('kehadiranTarikh').textContent = formatTarikh(todayString());
+        const histEl = document.getElementById('kehadiranHistoryList');
+        histEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400)"><div class="spinner" style="margin:0 auto 8px"></div>Memuatkan...</div>';
+        try {
+            const res = await fetch(`${CONFIG.GAS_URL}?action=getKehadiran&ndp=${currentUser.ndp}&token=${CONFIG.TOKEN}`);
+            const result = await res.json();
+            if (result.status !== 'success') {
+                histEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red)">Gagal memuatkan: ' + (result.message || 'Ralat') + '</div>';
+                return;
+            }
+            kehadiranHistory = result.data || [];
+            renderKehadiran();
+        } catch (e) {
+            histEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red)">Ralat sambungan</div>';
+        }
+    }
+
+    function renderKehadiran() {
+        const today = todayString();
+        const todayRecord = kehadiranHistory.find(k => k.tarikh === today);
+        if (todayRecord) {
+            document.getElementById('kehadiranSudahTanda').style.display = '';
+            document.getElementById('kehadiranBelumTanda').style.display = 'none';
+            document.getElementById('kehadiranSudahDetail').innerHTML =
+                `<strong>Status:</strong> ${todayRecord.status}<br><strong>Catatan:</strong> ${todayRecord.catatan || '—'}`;
+        } else {
+            document.getElementById('kehadiranSudahTanda').style.display = 'none';
+            document.getElementById('kehadiranBelumTanda').style.display = '';
+            selectedKehadiranStatus = '';
+            document.getElementById('fCatatan').value = '';
+            const btnH = document.getElementById('btnHadir');
+            const btnT = document.getElementById('btnTidakHadir');
+            btnH.style.background = 'var(--gray-100)'; btnH.style.borderColor = 'var(--gray-200)'; btnH.style.color = 'var(--black)';
+            btnT.style.background = 'var(--gray-100)'; btnT.style.borderColor = 'var(--gray-200)'; btnT.style.color = 'var(--black)';
+        }
+
+        const histEl = document.getElementById('kehadiranHistoryList');
+        const past = kehadiranHistory.filter(k => k.tarikh !== today).sort((a, b) => b.tarikh.localeCompare(a.tarikh));
+        if (past.length === 0) {
+            histEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400)">Belum ada rekod kehadiran terdahulu.</div>';
+            return;
+        }
+        histEl.innerHTML = past.map(k => {
+            const isHadir = k.status === 'Hadir';
+            return `<div style="display:flex;gap:12px;padding:12px;border-bottom:1px solid var(--gray-100);align-items:flex-start">
+                <div style="flex-shrink:0;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;background:${isHadir ? '#dcfce7' : '#fee2e2'};color:${isHadir ? '#166534' : '#991b1b'}">${isHadir ? '✓' : '✗'}</div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:700;color:var(--black);margin-bottom:2px">${formatTarikh(k.tarikh)}</div>
+                    <div style="font-size:12px;color:${isHadir ? 'var(--green)' : 'var(--red)'};font-weight:600;margin-bottom:4px">${k.status}</div>
+                    <div style="font-size:12px;color:var(--gray-600);line-height:1.5;word-break:break-word">${k.catatan || '<em style="color:var(--gray-400)">Tiada catatan</em>'}</div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    async function simpanKehadiran() {
+        if (!selectedKehadiranStatus) { showToast("Sila pilih status kehadiran", "error"); return; }
+        const catatan = document.getElementById('fCatatan').value.trim();
+        if (!catatan) { showToast("Sila tulis catatan harian", "error"); return; }
+        const btn = document.getElementById('btnSimpanKehadiran');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="border-top-color:var(--yellow)"></div> Menyimpan...';
+        const payload = {
+            action: 'markAttendance', token: CONFIG.TOKEN,
+            ndp: currentUser.ndp, nama: currentUser.nama,
+            tarikh: todayString(), status: selectedKehadiranStatus, catatan: catatan
+        };
+        try {
+            const res = await fetch(CONFIG.GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+            const result = await res.json();
+            if (result.status === 'success') {
+                showToast("Kehadiran berjaya disimpan!");
+                await loadKehadiran();
+            } else {
+                showToast("Ralat: " + (result.message || 'Gagal'), "error");
+            }
+        } catch (e) {
+            showToast("Ralat sambungan", "error");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span class="accent">▶</span> SIMPAN KEHADIRAN';
         }
     }
 
