@@ -1562,19 +1562,16 @@
     let lastKhSummary = []; // untuk print
 
     async function loadAdminKehadiran() {
-        // Populate filter dropdowns
+        // [FIX] Populate dropdown dari SEMUA pelajar (bukan filter LI), sama macam Senarai Pelajar
         const sesiSet = [...new Set(globalAdminData.map(p => p.sesi).filter(Boolean))].sort();
-        const kursusSet = [...new Set(globalAdminData
-            .filter(p => p.status === 'Latihan Industri')
-            .map(p => p.kursus).filter(Boolean))].sort();
+        const kursusSet = [...new Set(globalAdminData.map(p => p.kursus).filter(Boolean))].sort();
         const fSesi = document.getElementById('aKhSesi');
         const fKursus = document.getElementById('aKhKursus');
-        if (fSesi.children.length <= 1) {
-            fSesi.innerHTML = '<option value="">Semua Sesi</option>' + sesiSet.map(s => `<option value="${s}">${s}</option>`).join('');
-        }
-        if (fKursus.children.length <= 1) {
-            fKursus.innerHTML = '<option value="">Semua Kursus</option>' + kursusSet.map(k => `<option value="${k}">${k}</option>`).join('');
-        }
+        const curSesi = fSesi.value;
+        const curKursus = fKursus.value;
+        // [FIX] Sentiasa rebuild dropdown (bukan check children.length) supaya ia update bila data berubah
+        fSesi.innerHTML = '<option value="">Semua Sesi</option>' + sesiSet.map(s => `<option value="${s}" ${s===curSesi?'selected':''}>${s}</option>`).join('');
+        fKursus.innerHTML = '<option value="">Semua Kursus</option>' + kursusSet.map(k => `<option value="${k}" ${k===curKursus?'selected':''}>${k}</option>`).join('');
 
         const tbody = document.getElementById('aKhTableBody');
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px"><div class="spinner" style="margin:0 auto 8px"></div>Memuatkan data kehadiran...</td></tr>';
